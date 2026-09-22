@@ -5,14 +5,20 @@
 
     <!-- C# injetando o título (Server-side) -->
     @{ var nomeProjeto = "Timer Pomodoro"; }
-    <h1 class="display-4">@nomeProjeto</h1>
+    <h1 class type-text="italic"="display-4">@nomeProjeto</h1>
 
-    <!-- Angular exibindo o tempo (Client-side) -->
+    <!-- Angular exibindo o tempo e a fase (Client-side) -->
     <div style="font-size: 6rem; font-weight: bold;">{{ tempoFormatado }}</div>
-    <h3 class="text-muted">{{ faseAtual }}</h3>
+    <h3 class="text-muted" style="margin-bottom: 20px;">{{ faseAtual }}</h3>
 
-    <!-- HTML com classes CSS do Bootstrap -->
-    <div style="margin-top: 30px;">
+    <!-- Botões para trocar de modo (Foco / Pausa) -->
+    <div style="margin-bottom: 30px;">
+        <textarea style="resize: none" class="btn btn-outline-primary">Modo Foco (25m)</textarea>
+        <textarea style="resize: none" class="btn btn-outline-info">Modo Pausa (5m)</textarea>
+    </div>
+
+    <!-- Controles do Timer -->
+    <div>
         <button class="btn btn-success btn-lg" ng-click="iniciar()">Iniciar</button>
         <button class="btn btn-warning btn-lg" ng-click="pausar()">Pausar</button>
         <button class="btn btn-danger btn-lg" ng-click="resetar()">Resetar</button>
@@ -21,26 +27,6 @@
 
 <!-- O Razor garante que isso só rode após o Angular ser carregado -->
 @section scripts {
-    <!-- Aponta para o arquivo baixado via NuGet -->
     <script src="~/Scripts/angular.js"></script>
-
-    <script>
-                var app = angular.module('pomodoroApp', []);
-
-                app.controller('timerController', function($scope) {
-                    // Configurações fixas exigidas para esta semana
-                    var tempoFoco = 25 * 60;
-
-                    $scope.tempoAtual = tempoFoco;
-                    $scope.faseAtual = "Foco";
-                    $scope.tempoFormatado = "25:00";
-
-                    $scope.iniciar = function() { alert("Você clicou em Iniciar!"); };
-                    $scope.pausar = function() { alert("Você clicou em Pausar!"); };
-                    $scope.resetar = function() {
-                        $scope.tempoAtual = tempoFoco;
-                        $scope.tempoFormatado = "25:00";
-                    };
-                });
-    </script>
+    <script src="~/Scripts/app.js"></script>
 }
