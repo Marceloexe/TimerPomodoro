@@ -3,24 +3,22 @@
 }
 <div class="text-center" style="margin-top: 50px;" ng-app="pomodoroApp" ng-controller="timerController">
 
-    <!-- C# injetando o título (Server-side) -->
     @{ var nomeProjeto = "Timer Pomodoro"; }
-    <h1 class type-text="italic" ="display-4">@nomeProjeto</h1>
+    <h1 class="display-4">@nomeProjeto</h1>
 
-    <!-- Angular exibindo o tempo e a fase (Client-side) -->
     <div style="font-size: 6rem; font-weight: bold;">{{ tempoFormatado }}</div>
     <h3 class="text-muted" style="margin-bottom: 20px;">{{ faseAtual }}</h3>
 
     <div style="margin-bottom: 30px;">
-        <button id="foco_btn" class="btn" ng-click="foco()" ng-class="faseAtual === 'Foco' ? 'btn-primary' : 'btn-outline-primary'">
+        <button class="btn" ng-click="foco()" ng-class="faseAtual === 'Foco' ? 'btn-primary' : 'btn-outline-primary'">
             Foco (25m)
         </button>
 
-        <button id="pausa_c" class="btn" ng-click="pausaCurta()" ng-class="faseAtual === 'Pausa Curta' ? 'btn-warning' : 'btn-outline-secondary'">
+        <button class="btn" ng-click="pausaCurta()" ng-class="faseAtual === 'Pausa Curta' ? 'btn-warning' : 'btn-outline-secondary'">
             Pausa Curta (5m)
         </button>
 
-        <button id="pausa_l" class="btn" ng-click="pausaLonga()" ng-class="faseAtual === 'Pausa Longa' ? 'btn-info' : 'btn-outline-info'">
+        <button class="btn" ng-click="pausaLonga()" ng-class="faseAtual === 'Pausa Longa' ? 'btn-info' : 'btn-outline-info'">
             Pausa Longa (15m)
         </button>
     </div>
@@ -32,7 +30,6 @@
     </div>
 </div>
 
-<!-- O Razor garante que isso só rode após o Angular ser carregado -->
 @section scripts {
     <script src="~/Scripts/angular.js"></script>
     <script src="~/Scripts/app.js"></script>
