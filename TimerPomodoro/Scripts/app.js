@@ -24,12 +24,15 @@ app.controller('timerController', function ($scope, $interval) {
 
         if ($scope.faseAtual === "Foco") {
             ciclosCompletados++;
+
             if (ciclosCompletados % 4 === 0) {
                 $scope.faseAtual = "Pausa Longa";
                 $scope.tempoAtual = TEMPO_PAUSA_LONGA;
+                
             } else {
                 $scope.faseAtual = "Pausa Curta";
                 $scope.tempoAtual = TEMPO_PAUSA_CURTA;
+               
             }
         } else {
             $scope.faseAtual = "Foco";
@@ -38,6 +41,25 @@ app.controller('timerController', function ($scope, $interval) {
 
         atualizarTela();
     }
+
+    $scope.foco = function () {
+        $scope.faseAtual = "Foco"
+        $scope.tempoAtual = TEMPO_FOCO;
+        $scope.tempoFormatado = "25:00";
+    }
+
+    $scope.pausaCurta = function () {
+        $scope.faseAtual = "Pausa Curta"
+        $scope.tempoAtual = TEMPO_PAUSA_CURTA;
+        $scope.tempoFormatado = "05:00";
+    }
+
+    $scope.pausaLonga = function () {
+        $scope.faseAtual = "Pausa Longa"
+        $scope.tempoAtual = TEMPO_PAUSA_LONGA;
+        $scope.tempoFormatado = "15:00";
+    }
+
     $scope.iniciar = function () {
         if (angular.isDefined(promessaTimer)) return;
 

@@ -5,19 +5,26 @@
 
     <!-- C# injetando o título (Server-side) -->
     @{ var nomeProjeto = "Timer Pomodoro"; }
-    <h1 class type-text="italic"="display-4">@nomeProjeto</h1>
+    <h1 class type-text="italic" ="display-4">@nomeProjeto</h1>
 
     <!-- Angular exibindo o tempo e a fase (Client-side) -->
     <div style="font-size: 6rem; font-weight: bold;">{{ tempoFormatado }}</div>
     <h3 class="text-muted" style="margin-bottom: 20px;">{{ faseAtual }}</h3>
 
-    <!-- Botões para trocar de modo (Foco / Pausa) -->
     <div style="margin-bottom: 30px;">
-        <textarea style="resize: none" class="btn btn-outline-primary">Modo Foco (25m)</textarea>
-        <textarea style="resize: none" class="btn btn-outline-info">Modo Pausa (5m)</textarea>
+        <button id="foco_btn" class="btn" ng-click="foco()" ng-class="faseAtual === 'Foco' ? 'btn-primary' : 'btn-outline-primary'">
+            Foco (25m)
+        </button>
+
+        <button id="pausa_c" class="btn" ng-click="pausaCurta()" ng-class="faseAtual === 'Pausa Curta' ? 'btn-warning' : 'btn-outline-secondary'">
+            Pausa Curta (5m)
+        </button>
+
+        <button id="pausa_l" class="btn" ng-click="pausaLonga()" ng-class="faseAtual === 'Pausa Longa' ? 'btn-info' : 'btn-outline-info'">
+            Pausa Longa (15m)
+        </button>
     </div>
 
-    <!-- Controles do Timer -->
     <div>
         <button class="btn btn-success btn-lg" ng-click="iniciar()">Iniciar</button>
         <button class="btn btn-warning btn-lg" ng-click="pausar()">Pausar</button>
