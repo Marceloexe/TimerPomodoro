@@ -6,6 +6,7 @@ app.controller('timerController', function ($scope, $interval) {
     var TEMPO_PAUSA_LONGA = 15 * 60;
     var promessaTimer;
     var ciclosCompletados = 0;
+    var tocadorDeAudio = new Audio('despertador-iphone.mp3');
 
     $scope.tempoAtual = TEMPO_FOCO;
     $scope.faseAtual = "Foco";
@@ -21,6 +22,13 @@ app.controller('timerController', function ($scope, $interval) {
 
     function avancarFase() {
         $scope.pausar();
+        tocadorDeAudio.play();
+        setTimeout(function () {
+
+            tocadorDeAudio.pause();
+            tocadorDeAudio.currentTime = 0;
+
+        }, 60000);
 
         if ($scope.faseAtual === "Foco") {
             ciclosCompletados++;
@@ -61,6 +69,7 @@ app.controller('timerController', function ($scope, $interval) {
     }
 
     $scope.iniciar = function () {
+        tocadorDeAudio.pause();
         if (angular.isDefined(promessaTimer)) return;
 
         promessaTimer = $interval(function () {
@@ -74,6 +83,7 @@ app.controller('timerController', function ($scope, $interval) {
     };
 
     $scope.pausar = function () {
+        tocadorDeAudio.pause();
         if (angular.isDefined(promessaTimer)) {
             $interval.cancel(promessaTimer);
             promessaTimer = undefined;
