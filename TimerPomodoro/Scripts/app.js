@@ -80,7 +80,6 @@ app.controller('timerController', function ($scope, $interval) {
         }
     };
 
-
     $scope.resetar = function () {
         $scope.pausar();
         $scope.tempoAtual = TEMPO_FOCO;
