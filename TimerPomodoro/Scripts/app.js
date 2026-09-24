@@ -4,13 +4,16 @@ app.controller('timerController', function ($scope, $interval) {
     var TEMPO_FOCO = 25 * 60;
     var TEMPO_PAUSA_CURTA = 5 * 60;
     var TEMPO_PAUSA_LONGA = 15 * 60;
+
     var promessaTimer;
     var ciclosCompletados = 0;
+
     var tocadorDeAudio = new Audio('despertador-iphone.mp3');
 
     $scope.tempoAtual = TEMPO_FOCO;
     $scope.faseAtual = "Foco";
-    $scope.tempoFormatado = "25:00";
+    
+    atualizarTela();
 
     function atualizarTela() {
         var minutos = Math.floor($scope.tempoAtual / 60);
@@ -53,19 +56,19 @@ app.controller('timerController', function ($scope, $interval) {
     $scope.foco = function () {
         $scope.faseAtual = "Foco"
         $scope.tempoAtual = TEMPO_FOCO;
-        $scope.tempoFormatado = "25:00";
+        atualizarTela();
     }
 
     $scope.pausaCurta = function () {
         $scope.faseAtual = "Pausa Curta"
         $scope.tempoAtual = TEMPO_PAUSA_CURTA;
-        $scope.tempoFormatado = "05:00";
+        atualizarTela();
     }
 
     $scope.pausaLonga = function () {
         $scope.faseAtual = "Pausa Longa"
         $scope.tempoAtual = TEMPO_PAUSA_LONGA;
-        $scope.tempoFormatado = "15:00";
+        atualizarTela();
     }
 
     $scope.iniciar = function () {
