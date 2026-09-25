@@ -1,9 +1,9 @@
 var app = angular.module('pomodoroApp', []);
 
 app.controller('timerController', function ($scope, $interval) {
-    var TEMPO_FOCO = 25 * 60;
-    var TEMPO_PAUSA_CURTA = 5 * 60;
-    var TEMPO_PAUSA_LONGA = 15 * 60;
+    const TEMPO_FOCO = 25 * 60;
+    const TEMPO_PAUSA_CURTA = 5 * 60;
+    const TEMPO_PAUSA_LONGA = 15 * 60;
 
     var promessaTimer;
     var ciclosCompletados = 0;
