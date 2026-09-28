@@ -25,13 +25,15 @@ app.controller('timerController', function ($scope, $interval) {
 
     function avancarFase() {
         $scope.pausar();
-        tocadorDeAudio.play();
-        setTimeout(function () {
 
-            tocadorDeAudio.pause();
-            tocadorDeAudio.currentTime = 0;
-
-        }, 60000);
+        tocadorDeAudio.play().then(function () {
+            setTimeout(function () {
+                tocadorDeAudio.pause();
+                tocadorDeAudio.currentTime = 0;
+            }, 60000);
+        }).catch(function (error) {
+            console.error("Erro ao tentar tocar o áudio:", error);
+        });
 
         if ($scope.faseAtual === "Foco") {
             ciclosCompletados++;
@@ -39,35 +41,15 @@ app.controller('timerController', function ($scope, $interval) {
             if (ciclosCompletados % 4 === 0) {
                 $scope.faseAtual = "Pausa Longa";
                 $scope.tempoAtual = TEMPO_PAUSA_LONGA;
-                
             } else {
                 $scope.faseAtual = "Pausa Curta";
                 $scope.tempoAtual = TEMPO_PAUSA_CURTA;
-               
             }
         } else {
             $scope.faseAtual = "Foco";
             $scope.tempoAtual = TEMPO_FOCO;
         }
 
-        atualizarTela();
-    }
-
-    $scope.foco = function () {
-        $scope.faseAtual = "Foco"
-        $scope.tempoAtual = TEMPO_FOCO;
-        atualizarTela();
-    }
-
-    $scope.pausaCurta = function () {
-        $scope.faseAtual = "Pausa Curta"
-        $scope.tempoAtual = TEMPO_PAUSA_CURTA;
-        atualizarTela();
-    }
-
-    $scope.pausaLonga = function () {
-        $scope.faseAtual = "Pausa Longa"
-        $scope.tempoAtual = TEMPO_PAUSA_LONGA;
         atualizarTela();
     }
 

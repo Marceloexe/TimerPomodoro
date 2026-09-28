@@ -9,18 +9,21 @@
     <div style="font-size: 6rem; font-weight: bold;">{{ tempoFormatado }}</div>
     <h3 class="text-muted" style="margin-bottom: 20px;">{{ faseAtual }}</h3>
 
-    <div style="margin-bottom: 30px;">
-        <button class="btn" ng-click="foco()" ng-class="faseAtual === 'Foco' ? 'btn-primary' : 'btn-outline-primary'">
+    <div class="d-flex justify-content-center gap-2 my-4">
+        <div class="p-3 border rounded shadow-sm"
+             ng-class="faseAtual === 'Foco' ? 'bg-primary text-white' : 'bg-white text-dark'">
             Foco (25m)
-        </button>
+        </div>
 
-        <button class="btn" ng-click="pausaCurta()" ng-class="faseAtual === 'Pausa Curta' ? 'btn-warning' : 'btn-outline-secondary'">
+        <div class="p-3 border rounded shadow-sm"
+             ng-class="faseAtual === 'Pausa Curta' ? 'bg-warning text-dark' : 'bg-white text-dark'">
             Pausa Curta (5m)
-        </button>
+        </div>
 
-        <button class="btn" ng-click="pausaLonga()" ng-class="faseAtual === 'Pausa Longa' ? 'btn-info' : 'btn-outline-info'">
+        <div class="p-3 border rounded shadow-sm"
+             ng-class="faseAtual === 'Pausa Longa' ? 'bg-info text-white' : 'bg-white text-dark'">
             Pausa Longa (15m)
-        </button>
+        </div>
     </div>
 
     <div>
