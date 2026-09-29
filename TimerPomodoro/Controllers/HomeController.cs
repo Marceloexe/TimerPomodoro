@@ -26,5 +26,10 @@ namespace TimerPomodoro.Controllers
 
 			return View();
 		}
+
+		public ActionResult Configuracao()
+		{
+			return View();
+		}
 	}
 }

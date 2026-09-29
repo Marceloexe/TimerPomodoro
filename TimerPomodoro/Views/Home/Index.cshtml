@@ -1,48 +1,123 @@
 ﻿@{
     ViewBag.Title = "Home Page";
 }
-<div class="text-center" style="margin-top: 50px;" ng-app="pomodoroApp" ng-controller="timerController">
 
-    @{ var nomeProjeto = "Timer Pomodoro"; }
-    <h1 class="display-4">@nomeProjeto</h1>
+<div class="text-center" style="margin-top: 30px;" ng-controller="timerController">
 
+    <h1 class="display-4">Timer Pomodoro</h1>
+
+    <!-- Exibição da Tarefa Em Andamento -->
+    <div class="alert alert-primary d-inline-block px-4 py-2 my-2 shadow-sm" ng-if="tarefaAtiva">
+        <small class="text-uppercase fw-bold text-muted d-block">Trabalhando agora em:</small>
+        <strong>{{ tarefaAtiva.Titulo }}</strong>
+        <span class="badge bg-dark ms-2">🍅 {{ tarefaAtiva.PomodorosConcluidos }} / {{ tarefaAtiva.PomodorosEstimados }}</span>
+    </div>
+    <div class="alert alert-light d-inline-block px-4 py-2 my-2 border" ng-if="!tarefaAtiva">
+        <small class="text-muted">Nenhuma tarefa selecionada. Escolha uma abaixo para vincular o tempo.</small>
+    </div>
+
+    <!-- Timer e Fase -->
     <div style="font-size: 6rem; font-weight: bold;">{{ tempoFormatado }}</div>
-    <h3 class="text-muted" style="margin-bottom: 20px;">{{ faseAtual }}</h3>
+    <h3 class="text-muted mb-3">{{ faseAtual }}</h3>
 
-    <div class="d-flex justify-content-center gap-2 my-4">
-        <div class="p-3 border rounded shadow-sm"
-             ng-class="faseAtual === 'Foco' ? 'bg-primary text-white' : 'bg-white text-dark'">
-            Foco (25m)
+    <!-- Botão de Configurações -->
+    <div class="configuracao" style="position: absolute; top: 20px; right: 20px;">
+        <button type="button" ng-click="configuracao()" class="btn btn-outline-secondary">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-gear" viewBox="0 0 16 16">
+                <path d="M8 4.754a3.246 3.246 0 1 0 0 6.492 3.246 3.246 0 0 0 0-6.492M5.754 8a2.246 2.246 0 1 1 4.492 0 2.246 2.246 0 0 1-4.492 0" />
+                <path d="M9.796 1.343c-.527-1.79-3.065-1.79-3.592 0l-.094.319a.873.873 0 0 1-1.255.52l-.292-.16c-1.64-.892-3.433.902-2.54 2.541l.159.292a.873.873 0 0 1-.52 1.255l-.319.094c-1.79.527-1.79 3.065 0 3.592l.319.094a.873.873 0 0 1 .52 1.255l-.16.292c-.892 1.64.901 3.434 2.541 2.54l.292-.159a.873.873 0 0 1 1.255.52l.094.319c.527 1.79 3.065 1.79 3.592 0l.094-.319a.873.873 0 0 1 1.255-.52l.292.16c1.64.893 3.434-.902 2.54-2.541l-.159-.292a.873.873 0 0 1 .52-1.255l.319-.094c1.79-.527 1.79-3.065 0-3.592l-.319-.094a.873.873 0 0 1-.52-1.255l.16-.292c.893-1.64-.902-3.433-2.541-2.54l-.292.159a.873.873 0 0 1-1.255-.52zm-2.633.283c.246-.835 1.428-.835 1.674 0l.094.319a1.873 1.873 0 0 0 2.693 1.115l.291-.16c.764-.415 1.6.42 1.184 1.185l-.159.292a1.873 1.873 0 0 0 1.116 2.692l.318.094c.835.246.835 1.428 0 1.674l-.319.094a1.873 1.873 0 0 0-1.115 2.693l.16.291c.415.764-.42 1.6-1.185 1.184l-.291-.159a1.873 1.873 0 0 0-2.693 1.116l-.094.318c-.246.835-1.428.835-1.674 0l-.094-.319a1.873 1.873 0 0 0-2.692-1.115l-.292.16c-.764.415-1.6-.42-1.184-1.185l.159-.291A1.873 1.873 0 0 0 1.945 8.93l-.319-.094c-.835-.246-.835-1.428 0-1.674l.319-.094A1.873 1.873 0 0 0 3.06 4.377l-.16-.292c-.415-.764.42-1.6 1.185-1.184l.292.159a1.873 1.873 0 0 0 2.692-1.115z" />
+            </svg>
+        </button>
+    </div>
+
+    <!-- Indicadores das Fases -->
+    <div class="d-flex justify-content-center gap-2 my-3">
+        <div class="p-3 border rounded shadow-sm" ng-class="faseAtual === 'Foco' ? 'bg-primary text-white' : 'bg-white text-dark'">
+            Foco ({{ tempoFocoCustom }}m)
         </div>
-
-        <div class="p-3 border rounded shadow-sm"
-             ng-class="faseAtual === 'Pausa Curta' ? 'bg-warning text-dark' : 'bg-white text-dark'">
-            Pausa Curta (5m)
+        <div class="p-3 border rounded shadow-sm" ng-class="faseAtual === 'Pausa Curta' ? 'bg-warning text-dark' : 'bg-white text-dark'">
+            Pausa Curta ({{ pausaCurtaCustom }}m)
         </div>
-
-        <div class="p-3 border rounded shadow-sm"
-             ng-class="faseAtual === 'Pausa Longa' ? 'bg-info text-white' : 'bg-white text-dark'">
-            Pausa Longa (15m)
+        <div class="p-3 border rounded shadow-sm" ng-class="faseAtual === 'Pausa Longa' ? 'bg-info text-white' : 'bg-white text-dark'">
+            Pausa Longa ({{ pausaLongaCustom }}m)
         </div>
     </div>
 
-    <div>
-        <button class="btn btn-dark btn-lg" ng-click="iniciar()"> <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-play-fill" viewBox="0 0 16 16">
-        <path d="m11.596 8.697-6.363 3.692c-.54.313-1.233-.066-1.233-.697V4.308c0-.63.692-1.01 1.233-.696l6.363 3.692a.802.802 0 0 1 0 1.393" />
-        </svg> Iniciar</button>
+    <!-- Botões do Timer -->
+    <div class="mb-5">
+        <button class="btn btn-dark btn-lg" ng-click="iniciar()">Iniciar</button>
+        <button class="btn btn-dark btn-lg" ng-click="pausar()">Pausar</button>
+        <button class="btn btn-dark btn-lg" ng-click="resetar()">Resetar</button>
+    </div>
 
-        <button class="btn btn-dark btn-lg" ng-click="pausar()"> <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pause" viewBox="0 0 16 16">
-        <path d="M6 3.5a.5.5 0 0 1 .5.5v8a.5.5 0 0 1-1 0V4a.5.5 0 0 1 .5-.5m4 0a.5.5 0 0 1 .5.5v8a.5.5 0 0 1-1 0V4a.5.5 0 0 1 .5-.5" />
-        </svg> Pausar</button>
+    <hr />
 
-        <button class="btn btn-dark btn-lg" ng-click="resetar()"> <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-counterclockwise" viewBox="0 0 16 16">
-        <path fill-rule="evenodd" d="M8 3a5 5 0 1 1-4.546 2.914.5.5 0 0 0-.908-.417A6 6 0 1 0 8 2z" />
-        <path d="M8 4.466V.534a.25.25 0 0 0-.41-.192L5.23 2.308a.25.25 0 0 0 0 .384l2.36 1.966A.25.25 0 0 0 8 4.466" />
-        </svg> Resetar</button>
+    <!-- Painel CRUD de Tarefas -->
+    <div class="row text-start mt-4">
+        <div class="col-md-4 mb-4">
+            <div class="card shadow-sm">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0">{{ novaTarefa.Id === 0 ? 'Nova Tarefa' : 'Editar Tarefa' }}</h5>
+                </div>
+                <div class="card-body">
+                    <form ng-submit="salvarTarefa()">
+                        <div class="mb-3">
+                            <label class="form-label">Título</label>
+                            <input type="text" class="form-control" ng-model="novaTarefa.Titulo" required placeholder="Ex: Criar documentação">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Descrição</label>
+                            <textarea class="form-control" ng-model="novaTarefa.Descricao" rows="2"></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Quantidade de ciclos</label>
+                            <input type="number" class="form-control" min="1" ng-model="novaTarefa.PomodorosEstimados">
+                        </div>
+                        <div class="d-flex justify-content-between">
+                            <button type="button" class="btn btn-outline-secondary" ng-click="limparFormulario()" ng-if="novaTarefa.Id !== 0">Cancelar</button>
+                            <button type="submit" class="btn btn-success w-100 ms-1">Salvar</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-8">
+            <div class="card shadow-sm">
+                <div class="card-header bg-light d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Suas Tarefas</h5>
+                    <span class="badge bg-secondary">{{ tarefas.length }} cadastrada(s)</span>
+                </div>
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item d-flex justify-content-between align-items-center"
+                        ng-repeat="t in tarefas track by $index"
+                        ng-class="{'table-active': tarefaAtiva.Id === t.Id}">
+
+                        <div>
+                            <h6 class="mb-0" ng-class="{'text-decoration-line-through text-muted': t.Concluida}">
+                                {{ t.Titulo }}
+                            </h6>
+                            <small class="text-muted" ng-if="t.Descricao">{{ t.Descricao }}</small>
+                            <div class="mt-1">
+                                <span class="badge border text-dark">
+                                    🍅 {{ t.PomodorosConcluidos || 0 }} / {{ t.PomodorosEstimados }}
+                                </span>
+                            </div>
+                        </div>
+
+                        <div class="btn-group btn-group-sm">
+                            <button class="btn btn-primary" ng-click="selecionarTarefa(t)">
+                                {{ tarefaAtiva.Id === t.Id ? 'Em Foco' : 'Selecionar' }}
+                            </button>
+                            <button class="btn btn-outline-secondary" ng-click="editarTarefa(t)">Editar</button>
+                            <button class="btn btn-outline-danger" ng-click="deletarTarefa(t.Id)">Excluir</button>
+                        </div>
+                    </li>
+                    <li class="list-group-item text-center text-muted py-4" ng-if="tarefas.length === 0">
+                        Nenhuma tarefa criada. Preencha o formulário ao lado para começar.
+                    </li>
+                </ul>
+            </div>
+        </div>
     </div>
 </div>
-
-@section scripts {
-    <script src="~/Scripts/angular.js"></script>
-    <script src="~/Scripts/app.js"></script>
-}
