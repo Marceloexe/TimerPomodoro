@@ -1,74 +1,59 @@
 var app = angular.module('pomodoroApp', []);
 
-app.controller('timerController', function ($scope, $interval, $window) {
+app.controller('timerController', function ($scope, $interval, $http, $timeout) {
 
-    var tempoFocoSalvo = localStorage.getItem('tempoFoco');
-    var tempoPausaCurtaSalva = localStorage.getItem('tempoPausaCurta');
-    var tempoPausaLongaSalva = localStorage.getItem('tempoPausaLonga');
+    var TEMPO_FOCO = 25 * 60;
+    var TEMPO_PAUSA_CURTA = 5 * 60;
+    var TEMPO_PAUSA_LONGA = 15 * 60;
 
-    var TEMPO_FOCO = tempoFocoSalvo ? parseInt(tempoFocoSalvo) : 25 * 60;
-    var TEMPO_PAUSA_CURTA = tempoPausaCurtaSalva ? parseInt(tempoPausaCurtaSalva) : 5 * 60;
-    var TEMPO_PAUSA_LONGA = tempoPausaLongaSalva ? parseInt(tempoPausaLongaSalva) : 15 * 60;
-
-    $scope.tempoFocoCustom = TEMPO_FOCO / 60;
-    $scope.pausaCurtaCustom = TEMPO_PAUSA_CURTA / 60;
-    $scope.pausaLongaCustom = TEMPO_PAUSA_LONGA / 60;
+    $scope.tempoFocoCustom = 25;
+    $scope.pausaCurtaCustom = 5;
+    $scope.pausaLongaCustom = 15;
 
     var promessaTimer;
     var ciclosCompletados = 0;
-    var tocadorDeAudio = new Audio('despertador-iphone.mp3');
+    var tocadorDeAudio = new Audio('/despertador-iphone.mp3');
+    var dataInicioSessaoAtual = null;
 
     $scope.tempoAtual = TEMPO_FOCO;
     $scope.faseAtual = "Foco";
-
-    $scope.salvarConfiguracao = function () {
-        var tempoFocoSeg = ($scope.tempoFocoCustom || 25) * 60;
-        var pausaCurtaSeg = ($scope.pausaCurtaCustom || 5) * 60;
-        var pausaLongaSeg = ($scope.pausaLongaCustom || 15) * 60;
-
-        localStorage.setItem('tempoFoco', tempoFocoSeg);
-        localStorage.setItem('tempoPausaCurta', pausaCurtaSeg);
-        localStorage.setItem('tempoPausaLonga', pausaLongaSeg);
-
-        alert('Configurações salvas com sucesso!');
-        $window.location.href = '/Home/Index';
-    };
-
     $scope.tarefas = [];
     $scope.tarefaAtiva = null;
-    $scope.novaTarefa = { Id: 0, Titulo: '', Descricao: '', PomodorosEstimados: 1, PomodorosConcluidos: 0, Concluida: false };
+    $scope.mensagemErroPersistencia = null;
 
-    $scope.carregarTarefas = function () {
-        var tarefasSalvas = localStorage.getItem('listaTarefas');
-        $scope.tarefas = tarefasSalvas ? JSON.parse(tarefasSalvas) : [];
+    $scope.limparFormulario = function () {
+        $scope.novaTarefa = {
+            Id: 0,
+            Titulo: '',
+            Descricao: '',
+            TempoFoco: 25,
+            PausaCurta: 5,
+            PausaLonga: 15,
+            PomodorosConcluidos: 0,
+            Concluida: false
+        };
     };
 
-    function guardarTarefasNoStorage() {
-        localStorage.setItem('listaTarefas', JSON.stringify($scope.tarefas));
-    }
-
-    $scope.selecionarTarefa = function (tarefa) {
-        $scope.tarefaAtiva = tarefa;
+    $scope.carregarTarefas = function () {
+        $http.get('/Tarefas/Listar').then(function (response) {
+            if (response.data && Array.isArray(response.data)) {
+                $scope.tarefas = response.data;
+            }
+        }).catch(function (error) {
+            console.error('[ERRO API] Falha ao carregar lista de tarefas:', error);
+        });
     };
 
     $scope.salvarTarefa = function () {
         if (!$scope.novaTarefa.Titulo) return;
 
-        if ($scope.novaTarefa.Id === 0) {
-            $scope.novaTarefa.Id = new Date().getTime();
-            $scope.novaTarefa.PomodorosConcluidos = 0;
-            $scope.tarefas.push(angular.copy($scope.novaTarefa));
-        } else {
-            for (var i = 0; i < $scope.tarefas.length; i++) {
-                if ($scope.tarefas[i].Id === $scope.novaTarefa.Id) {
-                    $scope.tarefas[i] = angular.copy($scope.novaTarefa);
-                    break;
-                }
-            }
-        }
-
-        guardarTarefasNoStorage();
-        $scope.limparFormulario();
+        $http.post('/Tarefas/Salvar', $scope.novaTarefa).then(function (response) {
+            $scope.carregarTarefas();
+            $scope.limparFormulario();
+        }).catch(function (err) {
+            alert('Não foi possível salvar a tarefa no banco de dados.');
+            console.error('[ERRO CRUD] Falha em salvarTarefa:', err);
+        });
     };
 
     $scope.editarTarefa = function (tarefa) {
@@ -77,36 +62,68 @@ app.controller('timerController', function ($scope, $interval, $window) {
 
     $scope.deletarTarefa = function (id) {
         if (confirm("Deseja eliminar esta tarefa?")) {
-            $scope.tarefas = $scope.tarefas.filter(function (t) { return t.Id !== id; });
-            if ($scope.tarefaAtiva && $scope.tarefaAtiva.Id === id) {
-                $scope.tarefaAtiva = null;
-            }
-            guardarTarefasNoStorage();
+            $http.post('/Tarefas/Excluir/' + id).then(function () {
+                if ($scope.tarefaAtiva && $scope.tarefaAtiva.Id === id) {
+                    $scope.tarefaAtiva = null;
+                }
+                $scope.carregarTarefas();
+            }).catch(function (err) {
+                alert('Erro ao excluir tarefa.');
+                console.error('[ERRO CRUD] Falha ao excluir:', err);
+            });
         }
     };
 
-    $scope.limparFormulario = function () {
-        $scope.novaTarefa = { Id: 0, Titulo: '', Descricao: '', PomodorosEstimados: 1, PomodorosConcluidos: 0, Concluida: false };
-    };
+    $scope.selecionarTarefa = function (tarefa) {
+        $scope.tarefaAtiva = tarefa;
 
-    function atualizarTela() {
-        var minutos = Math.floor($scope.tempoAtual / 60);
-        var segundos = $scope.tempoAtual % 60;
-        $scope.tempoFormatado = (minutos < 10 ? "0" : "") + minutos + ":" + (segundos < 10 ? "0" : "") + segundos;
-    }
+        TEMPO_FOCO = (tarefa.TempoFoco || 25) * 60;
+        TEMPO_PAUSA_CURTA = (tarefa.PausaCurta || 5) * 60;
+        TEMPO_PAUSA_LONGA = (tarefa.PausaLonga || 15) * 60;
+
+        $scope.tempoFocoCustom = tarefa.TempoFoco || 25;
+        $scope.pausaCurtaCustom = tarefa.PausaCurta || 5;
+        $scope.pausaLongaCustom = tarefa.PausaLonga || 15;
+
+        $scope.pausar();
+        if ($scope.faseAtual === "Foco") $scope.tempoAtual = TEMPO_FOCO;
+        else if ($scope.faseAtual === "Pausa Curta") $scope.tempoAtual = TEMPO_PAUSA_CURTA;
+        else $scope.tempoAtual = TEMPO_PAUSA_LONGA;
+
+        atualizarTela();
+    };
 
     function registrarSessaoConcluida() {
-        if ($scope.tarefaAtiva) {
-            $scope.tarefaAtiva.PomodorosConcluidos = ($scope.tarefaAtiva.PomodorosConcluidos || 0) + 1;
+        if (!$scope.tarefaAtiva) return;
 
-            for (var i = 0; i < $scope.tarefas.length; i++) {
-                if ($scope.tarefas[i].Id === $scope.tarefaAtiva.Id) {
-                    $scope.tarefas[i].PomodorosConcluidos = $scope.tarefaAtiva.PomodorosConcluidos;
-                    break;
+        var payloadSessao = {
+            TarefaId: $scope.tarefaAtiva.Id,
+            DataInicio: dataInicioSessaoAtual ? dataInicioSessaoAtual.toISOString() : new Date().toISOString(),
+            DataFim: new Date().toISOString()
+        };
+
+        $scope.tarefaAtiva.PomodorosConcluidos = ($scope.tarefaAtiva.PomodorosConcluidos || 0) + 1;
+
+        $http.post('/Tarefas/SalvarSessao', payloadSessao)
+            .then(function (res) {
+                if (res.data && res.data.sucesso) {
+                    $scope.tarefaAtiva.PomodorosConcluidos = res.data.pomodorosConcluidos;
                 }
-            }
-            guardarTarefasNoStorage();
-        }
+            })
+            .catch(function (error) {
+                console.error('[FALHA DE PERSISTÊNCIA SESSÃO]', {
+                    momento: new Date().toISOString(),
+                    tarefaId: payloadSessao.TarefaId,
+                    statusHttp: error.status,
+                    detalhes: error.data || 'Servidor indisponível / Sem conexão'
+                });
+
+                $scope.mensagemErroPersistencia = "Aviso: Conexão com o banco falhou. A sessão foi contabilizada na tela, mas não foi salva no servidor.";
+
+                $timeout(function () {
+                    $scope.mensagemErroPersistencia = null;
+                }, 6000);
+            });
     }
 
     function avancarFase() {
@@ -132,9 +149,19 @@ app.controller('timerController', function ($scope, $interval, $window) {
         atualizarTela();
     }
 
+    function atualizarTela() {
+        var minutos = Math.floor($scope.tempoAtual / 60);
+        var segundos = $scope.tempoAtual % 60;
+        $scope.tempoFormatado = (minutos < 10 ? "0" : "") + minutos + ":" + (segundos < 10 ? "0" : "") + segundos;
+    }
+
     $scope.iniciar = function () {
         tocadorDeAudio.pause();
         if (angular.isDefined(promessaTimer)) return;
+
+        if ($scope.faseAtual === "Foco" && !dataInicioSessaoAtual) {
+            dataInicioSessaoAtual = new Date();
+        }
 
         promessaTimer = $interval(function () {
             if ($scope.tempoAtual > 0) {
@@ -142,6 +169,7 @@ app.controller('timerController', function ($scope, $interval, $window) {
                 atualizarTela();
             } else {
                 avancarFase();
+                dataInicioSessaoAtual = null;
             }
         }, 1000);
     };
@@ -156,16 +184,14 @@ app.controller('timerController', function ($scope, $interval, $window) {
 
     $scope.resetar = function () {
         $scope.pausar();
+        dataInicioSessaoAtual = null;
         $scope.tempoAtual = TEMPO_FOCO;
         $scope.faseAtual = "Foco";
         ciclosCompletados = 0;
         atualizarTela();
     };
 
-    $scope.configuracao = function () {
-        $window.location.href = '/Home/Configuracao';
-    };
-
+    $scope.limparFormulario();
     atualizarTela();
     $scope.carregarTarefas();
 });

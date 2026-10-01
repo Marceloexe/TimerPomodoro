@@ -1,36 +1,27 @@
-﻿@{
-    ViewBag.Title = "Home Page";
+﻿<div class="alert alert-warning alert-dismissible fade show my-2" role="alert" ng-if="mensagemErroPersistencia">
+    <strong>⚠️ Erro de Sincronização:</strong> {{ mensagemErroPersistencia }}
+</div>
+
+@{
+    ViewBag.Title = "Timer Pomodoro";
 }
 
-<div class="text-center" style="margin-top: 30px;" ng-controller="timerController">
+<div class="text-center" style="margin-top: 20px;" ng-controller="timerController">
 
     <h1 class="display-4">Timer Pomodoro</h1>
 
-    <!-- Exibição da Tarefa Em Andamento -->
     <div class="alert alert-primary d-inline-block px-4 py-2 my-2 shadow-sm" ng-if="tarefaAtiva">
-        <small class="text-uppercase fw-bold text-muted d-block">Trabalhando agora em:</small>
+        <small class="text-uppercase fw-bold text-muted d-block">Trabalhando em agora:</small>
         <strong>{{ tarefaAtiva.Titulo }}</strong>
-        <span class="badge bg-dark ms-2">🍅 {{ tarefaAtiva.PomodorosConcluidos }} / {{ tarefaAtiva.PomodorosEstimados }}</span>
+        <span class="badge bg-dark ms-2">🍅 {{ tarefaAtiva.PomodorosConcluidos || 0 }} ciclo(s)</span>
     </div>
     <div class="alert alert-light d-inline-block px-4 py-2 my-2 border" ng-if="!tarefaAtiva">
-        <small class="text-muted">Nenhuma tarefa selecionada. Escolha uma abaixo para vincular o tempo.</small>
+        <small class="text-muted">Nenhuma tarefa selecionada. Escolha uma abaixo para carregar os seus tempos.</small>
     </div>
 
-    <!-- Timer e Fase -->
     <div style="font-size: 6rem; font-weight: bold;">{{ tempoFormatado }}</div>
     <h3 class="text-muted mb-3">{{ faseAtual }}</h3>
 
-    <!-- Botão de Configurações -->
-    <div class="configuracao" style="position: absolute; top: 20px; right: 20px;">
-        <button type="button" ng-click="configuracao()" class="btn btn-outline-secondary">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-gear" viewBox="0 0 16 16">
-                <path d="M8 4.754a3.246 3.246 0 1 0 0 6.492 3.246 3.246 0 0 0 0-6.492M5.754 8a2.246 2.246 0 1 1 4.492 0 2.246 2.246 0 0 1-4.492 0" />
-                <path d="M9.796 1.343c-.527-1.79-3.065-1.79-3.592 0l-.094.319a.873.873 0 0 1-1.255.52l-.292-.16c-1.64-.892-3.433.902-2.54 2.541l.159.292a.873.873 0 0 1-.52 1.255l-.319.094c-1.79.527-1.79 3.065 0 3.592l.319.094a.873.873 0 0 1 .52 1.255l-.16.292c-.892 1.64.901 3.434 2.541 2.54l.292-.159a.873.873 0 0 1 1.255.52l.094.319c.527 1.79 3.065 1.79 3.592 0l.094-.319a.873.873 0 0 1 1.255-.52l.292.16c1.64.893 3.434-.902 2.54-2.541l-.159-.292a.873.873 0 0 1 .52-1.255l.319-.094c1.79-.527 1.79-3.065 0-3.592l-.319-.094a.873.873 0 0 1-.52-1.255l.16-.292c.893-1.64-.902-3.433-2.541-2.54l-.292.159a.873.873 0 0 1-1.255-.52zm-2.633.283c.246-.835 1.428-.835 1.674 0l.094.319a1.873 1.873 0 0 0 2.693 1.115l.291-.16c.764-.415 1.6.42 1.184 1.185l-.159.292a1.873 1.873 0 0 0 1.116 2.692l.318.094c.835.246.835 1.428 0 1.674l-.319.094a1.873 1.873 0 0 0-1.115 2.693l.16.291c.415.764-.42 1.6-1.185 1.184l-.291-.159a1.873 1.873 0 0 0-2.693 1.116l-.094.318c-.246.835-1.428.835-1.674 0l-.094-.319a1.873 1.873 0 0 0-2.692-1.115l-.292.16c-.764.415-1.6-.42-1.184-1.185l.159-.291A1.873 1.873 0 0 0 1.945 8.93l-.319-.094c-.835-.246-.835-1.428 0-1.674l.319-.094A1.873 1.873 0 0 0 3.06 4.377l-.16-.292c-.415-.764.42-1.6 1.185-1.184l.292.159a1.873 1.873 0 0 0 2.692-1.115z" />
-            </svg>
-        </button>
-    </div>
-
-    <!-- Indicadores das Fases -->
     <div class="d-flex justify-content-center gap-2 my-3">
         <div class="p-3 border rounded shadow-sm" ng-class="faseAtual === 'Foco' ? 'bg-primary text-white' : 'bg-white text-dark'">
             Foco ({{ tempoFocoCustom }}m)
@@ -43,7 +34,6 @@
         </div>
     </div>
 
-    <!-- Botões do Timer -->
     <div class="mb-5">
         <button class="btn btn-dark btn-lg" ng-click="iniciar()">Iniciar</button>
         <button class="btn btn-dark btn-lg" ng-click="pausar()">Pausar</button>
@@ -52,9 +42,9 @@
 
     <hr />
 
-    <!-- Painel CRUD de Tarefas -->
     <div class="row text-start mt-4">
-        <div class="col-md-4 mb-4">
+
+        <div class="col-md-5 mb-4">
             <div class="card shadow-sm">
                 <div class="card-header bg-light">
                     <h5 class="mb-0">{{ novaTarefa.Id === 0 ? 'Nova Tarefa' : 'Editar Tarefa' }}</h5>
@@ -62,27 +52,40 @@
                 <div class="card-body">
                     <form ng-submit="salvarTarefa()">
                         <div class="mb-3">
-                            <label class="form-label">Título</label>
-                            <input type="text" class="form-control" ng-model="novaTarefa.Titulo" required placeholder="Ex: Criar documentação">
+                            <label class="form-label fw-bold">Título</label>
+                            <input type="text" class="form-control" ng-model="novaTarefa.Titulo" required placeholder="Ex: Estudar C# e Entity Framework">
                         </div>
+
                         <div class="mb-3">
-                            <label class="form-label">Descrição</label>
-                            <textarea class="form-control" ng-model="novaTarefa.Descricao" rows="2"></textarea>
+                            <label class="form-label fw-bold">Descrição</label>
+                            <textarea class="form-control" ng-model="novaTarefa.Descricao" rows="2" placeholder="Detalhes da tarefa..."></textarea>
                         </div>
-                        <div class="mb-3">
-                            <label class="form-label">Quantidade de ciclos</label>
-                            <input type="number" class="form-control" min="1" ng-model="novaTarefa.PomodorosEstimados">
+
+                        <div class="row">
+                            <div class="col-4 mb-3">
+                                <label class="form-label small fw-bold">Foco (min)</label>
+                                <input type="number" class="form-control" min="1" max="120" ng-model="novaTarefa.TempoFoco" required>
+                            </div>
+                            <div class="col-4 mb-3">
+                                <label class="form-label small fw-bold">Pausa (min)</label>
+                                <input type="number" class="form-control" min="1" max="60" ng-model="novaTarefa.PausaCurta" required>
+                            </div>
+                            <div class="col-4 mb-3">
+                                <label class="form-label small fw-bold">P. Longa (min)</label>
+                                <input type="number" class="form-control" min="1" max="60" ng-model="novaTarefa.PausaLonga" required>
+                            </div>
                         </div>
-                        <div class="d-flex justify-content-between">
+
+                        <div class="d-flex justify-content-between mt-2">
                             <button type="button" class="btn btn-outline-secondary" ng-click="limparFormulario()" ng-if="novaTarefa.Id !== 0">Cancelar</button>
-                            <button type="submit" class="btn btn-success w-100 ms-1">Salvar</button>
+                            <button type="submit" class="btn btn-success w-100 ms-1">Salvar Tarefa</button>
                         </div>
                     </form>
                 </div>
             </div>
         </div>
 
-        <div class="col-md-8">
+        <div class="col-md-7">
             <div class="card shadow-sm">
                 <div class="card-header bg-light d-flex justify-content-between align-items-center">
                     <h5 class="mb-0">Suas Tarefas</h5>
@@ -94,19 +97,19 @@
                         ng-class="{'table-active': tarefaAtiva.Id === t.Id}">
 
                         <div>
-                            <h6 class="mb-0" ng-class="{'text-decoration-line-through text-muted': t.Concluida}">
-                                {{ t.Titulo }}
-                            </h6>
-                            <small class="text-muted" ng-if="t.Descricao">{{ t.Descricao }}</small>
-                            <div class="mt-1">
-                                <span class="badge border text-dark">
-                                    🍅 {{ t.PomodorosConcluidos || 0 }} / {{ t.PomodorosEstimados }}
+                            <h6 class="mb-1 fw-bold">{{ t.Titulo }}</h6>
+                            <small class="text-muted d-block mb-1" ng-if="t.Descricao">{{ t.Descricao }}</small>
+
+                            <div class="d-flex gap-1 align-items-center">
+                                <span class="badge bg-dark">
+                                    🍅 {{ t.PomodorosConcluidos || 0 }} ciclo(s)
                                 </span>
+                                <span class="badge bg-secondary">⏱️ {{ t.TempoFoco }}m / {{ t.PausaCurta }}m / {{ t.PausaLonga }}m</span>
                             </div>
                         </div>
 
                         <div class="btn-group btn-group-sm">
-                            <button class="btn btn-primary" ng-click="selecionarTarefa(t)">
+                            <button class="btn" ng-class="tarefaAtiva.Id === t.Id ? 'btn-success' : 'btn-primary'" ng-click="selecionarTarefa(t)">
                                 {{ tarefaAtiva.Id === t.Id ? 'Em Foco' : 'Selecionar' }}
                             </button>
                             <button class="btn btn-outline-secondary" ng-click="editarTarefa(t)">Editar</button>

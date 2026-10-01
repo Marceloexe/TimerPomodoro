@@ -77,3 +77,7 @@ C:\GM\Pomodoro\TimerPomodoro\TimerPomodoro\obj\Debug\TimerPomodoro.csproj.CoreCo
 C:\GM\Pomodoro\TimerPomodoro\TimerPomodoro\obj\Debug\TimerPom.1B11A1F0.Up2Date
 C:\GM\Pomodoro\TimerPomodoro\TimerPomodoro\obj\Debug\TimerPomodoro.dll
 C:\GM\Pomodoro\TimerPomodoro\TimerPomodoro\obj\Debug\TimerPomodoro.pdb
+C:\GM\Pomodoro\TimerPomodoro\TimerPomodoro\bin\EntityFramework.dll
+C:\GM\Pomodoro\TimerPomodoro\TimerPomodoro\bin\EntityFramework.SqlServer.dll
+C:\GM\Pomodoro\TimerPomodoro\TimerPomodoro\bin\EntityFramework.xml
+C:\GM\Pomodoro\TimerPomodoro\TimerPomodoro\bin\EntityFramework.SqlServer.xml
