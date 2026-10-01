@@ -24,13 +24,13 @@
 
     <div class="d-flex justify-content-center gap-2 my-3">
         <div class="p-3 border rounded shadow-sm" ng-class="faseAtual === 'Foco' ? 'bg-primary text-white' : 'bg-white text-dark'">
-            Foco ({{ tempoFocoCustom }}m)
+            Foco ({{ tempoFocoCustom }}min)
         </div>
         <div class="p-3 border rounded shadow-sm" ng-class="faseAtual === 'Pausa Curta' ? 'bg-warning text-dark' : 'bg-white text-dark'">
-            Pausa Curta ({{ pausaCurtaCustom }}m)
+            Pausa Curta ({{ pausaCurtaCustom }}min)
         </div>
         <div class="p-3 border rounded shadow-sm" ng-class="faseAtual === 'Pausa Longa' ? 'bg-info text-white' : 'bg-white text-dark'">
-            Pausa Longa ({{ pausaLongaCustom }}m)
+            Pausa Longa ({{ pausaLongaCustom }}min)
         </div>
     </div>
 
@@ -53,7 +53,7 @@
                     <form ng-submit="salvarTarefa()">
                         <div class="mb-3">
                             <label class="form-label fw-bold">Título</label>
-                            <input type="text" class="form-control" ng-model="novaTarefa.Titulo" required placeholder="Ex: Estudar C# e Entity Framework">
+                            <input type="text" class="form-control" ng-model="novaTarefa.Titulo" required placeholder="Ex: Estudar, Trabalhar...">
                         </div>
 
                         <div class="mb-3">
