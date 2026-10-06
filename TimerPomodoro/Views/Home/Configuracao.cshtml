@@ -1,0 +1,52 @@
+﻿@{
+    ViewBag.Title = "Configurações";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2 style="text-align: center;">Configurações</h2>
+<hr />
+
+<div ng-controller="timerController">
+
+    <div class="foco">
+        <label for="numeroFoco">Digite a quantidade de minutos para definir o tempo de foco:</label>
+        <input type="number"
+               id="numeroFoco"
+               name="numeroFoco"
+               step="1"
+               min="1"
+               max="60"
+               ng-model="tempoFocoCustom"
+               oninput="if (this.value.length > 2) this.value = this.value.slice(0, 2);">
+    </div>
+    <br />
+
+    <div class="foco">
+        <label for="numeroPausaCurta">Digite a quantidade de minutos para definir o tempo da pausa curta:</label>
+        <input type="number"
+               id="numeroPausaCurta"
+               name="numeroPausaCurta"
+               step="1"
+               min="1"
+               max="60"
+               ng-model="pausaCurtaCustom"
+               oninput="if (this.value.length > 2) this.value = this.value.slice(0, 2);">
+    </div>
+    <br />
+
+    <div class="foco">
+        <label for="numeroPausaLonga">Digite a quantidade de minutos para definir o tempo da pausa longa:</label>
+        <input type="number"
+               id="numeroPausaLonga"
+               name="numeroPausaLonga"
+               step="1"
+               min="1"
+               max="60"
+               ng-model="pausaLongaCustom"
+               oninput="if (this.value.length > 2) this.value = this.value.slice(0, 2);">
+    </div>
+    <br />
+
+    <button type="button" ng-click="salvarConfiguracao()">Salvar</button>
+
+</div>

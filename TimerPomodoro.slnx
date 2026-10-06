@@ -1,3 +1,4 @@
 <Solution>
+  <Project Path="TimerPomodoro.Tests/TimerPomodoro.Tests.csproj" Id="93460057-9b4b-4c97-982f-9832acac7b55" />
   <Project Path="TimerPomodoro/TimerPomodoro.csproj" Id="41b3650f-8d17-4208-9a0e-8714724bcd76" />
 </Solution>

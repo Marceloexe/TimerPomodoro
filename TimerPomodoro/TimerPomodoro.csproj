@@ -132,6 +132,7 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
+    <Compile Include="Models\GerenciadorCiclos.cs" />
     <Compile Include="Models\MeuDbContext.cs" />
     <Compile Include="Models\SessaoFoco.cs" />
     <Compile Include="Models\Tarefa.cs" />
