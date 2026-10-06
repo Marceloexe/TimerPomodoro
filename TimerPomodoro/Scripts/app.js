@@ -111,7 +111,7 @@ app.controller('timerController', function ($scope, $interval, $http, $timeout) 
                 }
             })
             .catch(function (error) {
-                console.error('[FALHA DE PERSISTÊNCIA SESSÃO]', {
+                console.error('[FALHA DE PERSISTÊNCIA DA SESSÃO]', {
                     momento: new Date().toISOString(),
                     tarefaId: payloadSessao.TarefaId,
                     statusHttp: error.status,
