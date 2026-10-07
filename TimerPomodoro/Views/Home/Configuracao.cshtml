@@ -3,50 +3,86 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h2 style="text-align: center;">Configurações</h2>
-<hr />
+<div class="row text-start mt-4" ng-controller="timerController">
 
-<div ng-controller="timerController">
+    <!-- Formulário de Cadastro / Edição -->
+    <div class="col-md-5 mb-4">
+        <div class="card shadow-sm">
+            <div class="card-header bg-light">
+                <h5 class="mb-0">{{ novaTarefa.Id === 0 ? 'Nova Tarefa' : 'Editar Tarefa' }}</h5>
+            </div>
+            <div class="card-body">
+                <form ng-submit="salvarTarefa()">
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Título</label>
+                        <input type="text" class="form-control" ng-model="novaTarefa.Titulo" required placeholder="Ex: Estudar, Trabalhar...">
+                    </div>
 
-    <div class="foco">
-        <label for="numeroFoco">Digite a quantidade de minutos para definir o tempo de foco:</label>
-        <input type="number"
-               id="numeroFoco"
-               name="numeroFoco"
-               step="1"
-               min="1"
-               max="60"
-               ng-model="tempoFocoCustom"
-               oninput="if (this.value.length > 2) this.value = this.value.slice(0, 2);">
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Descrição</label>
+                        <textarea class="form-control" ng-model="novaTarefa.Descricao" rows="2" placeholder="Detalhes da tarefa..."></textarea>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-4 mb-3">
+                            <label class="form-label small fw-bold">Foco (min)</label>
+                            <input type="number" class="form-control" min="1" max="120" ng-model="novaTarefa.TempoFoco" required>
+                        </div>
+                        <div class="col-4 mb-3">
+                            <label class="form-label small fw-bold">Pausa (min)</label>
+                            <input type="number" class="form-control" min="1" max="60" ng-model="novaTarefa.PausaCurta" required>
+                        </div>
+                        <div class="col-4 mb-3">
+                            <label class="form-label small fw-bold">P. Longa (min)</label>
+                            <input type="number" class="form-control" min="1" max="60" ng-model="novaTarefa.PausaLonga" required>
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-between mt-2">
+                        <button type="button" class="btn btn-outline-secondary" ng-click="limparFormulario()" ng-if="novaTarefa.Id !== 0">Cancelar</button>
+                        <button type="submit" class="btn btn-success w-100 ms-1">Salvar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
     </div>
-    <br />
 
-    <div class="foco">
-        <label for="numeroPausaCurta">Digite a quantidade de minutos para definir o tempo da pausa curta:</label>
-        <input type="number"
-               id="numeroPausaCurta"
-               name="numeroPausaCurta"
-               step="1"
-               min="1"
-               max="60"
-               ng-model="pausaCurtaCustom"
-               oninput="if (this.value.length > 2) this.value = this.value.slice(0, 2);">
+    <div class="col-md-7">
+        <div class="card shadow-sm">
+            <div class="card-header bg-light d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">Suas Tarefas</h5>
+                <span class="badge bg-secondary">{{ tarefas.length }} cadastrada(s)</span>
+            </div>
+            <ul class="list-group list-group-flush">
+                <li class="list-group-item d-flex justify-content-between align-items-center"
+                    ng-repeat="t in tarefas track by $index"
+                    ng-class="{'table-active': tarefaAtiva.Id === t.Id}">
+
+                    <div>
+                        <h6 class="mb-1 fw-bold">{{ t.Titulo }}</h6>
+                        <small class="text-muted d-block mb-1" ng-if="t.Descricao">{{ t.Descricao }}</small>
+
+                        <div class="d-flex gap-1 align-items-center">
+                            <span class="badge bg-dark">
+                                🍅 {{ t.PomodorosConcluidos || 0 }} ciclo(s)
+                            </span>
+                            <span class="badge bg-secondary">⏱️ {{ t.TempoFoco }}m / {{ t.PausaCurta }}m / {{ t.PausaLonga }}m</span>
+                        </div>
+                    </div>
+
+                    <div class="btn-group btn-group-sm">
+                        <button class="btn" ng-class="tarefaAtiva.Id === t.Id ? 'btn-success' : 'btn-primary'" ng-click="selecionarETimer(t, '@Url.Action("Index", "Home")')">
+                            {{ tarefaAtiva.Id === t.Id ? 'Em Foco' : 'Selecionar e Iniciar' }}
+                        </button>
+                        <button class="btn btn-outline-secondary" ng-click="editarTarefa(t)">Editar</button>
+                        <button class="btn btn-outline-danger" ng-click="deletarTarefa(t.Id)">Excluir</button>
+                    </div>
+                </li>
+                <li class="list-group-item text-center text-muted py-4" ng-if="tarefas.length === 0">
+                    Nenhuma tarefa criada. Preencha o formulário ao lado para começar.
+                </li>
+            </ul>
+        </div>
     </div>
-    <br />
-
-    <div class="foco">
-        <label for="numeroPausaLonga">Digite a quantidade de minutos para definir o tempo da pausa longa:</label>
-        <input type="number"
-               id="numeroPausaLonga"
-               name="numeroPausaLonga"
-               step="1"
-               min="1"
-               max="60"
-               ng-model="pausaLongaCustom"
-               oninput="if (this.value.length > 2) this.value = this.value.slice(0, 2);">
-    </div>
-    <br />
-
-    <button type="button" ng-click="salvarConfiguracao()">Salvar</button>
 
 </div>

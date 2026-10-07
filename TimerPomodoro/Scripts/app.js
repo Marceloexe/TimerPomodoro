@@ -1,6 +1,10 @@
 var app = angular.module('pomodoroApp', []);
 
-app.controller('timerController', function ($scope, $interval, $http, $timeout) {
+app.controller('timerController', function ($scope, $interval, $http, $timeout, $window) {
+
+    $scope.redirecionar = function (url) {
+        $window.location.href = url;
+    };
 
     var TEMPO_FOCO = 25 * 60;
     var TEMPO_PAUSA_CURTA = 5 * 60;
@@ -20,6 +24,35 @@ app.controller('timerController', function ($scope, $interval, $http, $timeout) 
     $scope.tarefas = [];
     $scope.tarefaAtiva = null;
     $scope.mensagemErroPersistencia = null;
+
+    $scope.relatorioHoras = { Hoje: '0h 0m', Semana: '0h 0m', Mes: '0h 0m', Ano: '0h 0m' };
+
+    $scope.abrirModalRelatorio = function () {
+        $http.get('/Tarefas/ObterRelatorioHoras').then(function (response) {
+            if (response.data) {
+                $scope.relatorioHoras = response.data;
+            }
+        }).catch(function (err) {
+            console.error('Erro ao carregar relatório de horas:', err);
+        });
+    };
+
+    var tarefaSalva = localStorage.getItem('tarefaAtiva');
+    if (tarefaSalva) {
+        try {
+            var t = JSON.parse(tarefaSalva);
+            $scope.tarefaAtiva = t;
+            TEMPO_FOCO = (t.TempoFoco || 25) * 60;
+            TEMPO_PAUSA_CURTA = (t.PausaCurta || 5) * 60;
+            TEMPO_PAUSA_LONGA = (t.PausaLonga || 15) * 60;
+            $scope.tempoFocoCustom = t.TempoFoco || 25;
+            $scope.pausaCurtaCustom = t.PausaCurta || 5;
+            $scope.pausaLongaCustom = t.PausaLonga || 15;
+            $scope.tempoAtual = TEMPO_FOCO;
+        } catch (e) {
+            console.error('Erro ao ler localStorage:', e);
+        }
+    }
 
     $scope.limparFormulario = function () {
         $scope.novaTarefa = {
@@ -56,6 +89,15 @@ app.controller('timerController', function ($scope, $interval, $http, $timeout) 
         });
     };
 
+    $scope.selecionarETimer = function (tarefa, urlRedirecionamento) {
+        $scope.selecionarTarefa(tarefa);
+        localStorage.setItem('tarefaAtiva', JSON.stringify(tarefa));
+
+        if (urlRedirecionamento) {
+            $window.location.href = urlRedirecionamento;
+        }
+    };
+
     $scope.editarTarefa = function (tarefa) {
         $scope.novaTarefa = angular.copy(tarefa);
     };
@@ -65,6 +107,7 @@ app.controller('timerController', function ($scope, $interval, $http, $timeout) 
             $http.post('/Tarefas/Excluir/' + id).then(function () {
                 if ($scope.tarefaAtiva && $scope.tarefaAtiva.Id === id) {
                     $scope.tarefaAtiva = null;
+                    localStorage.removeItem('tarefaAtiva');
                 }
                 $scope.carregarTarefas();
             }).catch(function (err) {
@@ -108,6 +151,7 @@ app.controller('timerController', function ($scope, $interval, $http, $timeout) 
             .then(function (res) {
                 if (res.data && res.data.sucesso) {
                     $scope.tarefaAtiva.PomodorosConcluidos = res.data.pomodorosConcluidos;
+                    localStorage.setItem('tarefaAtiva', JSON.stringify($scope.tarefaAtiva));
                 }
             })
             .catch(function (error) {

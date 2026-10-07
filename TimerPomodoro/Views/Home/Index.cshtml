@@ -1,12 +1,72 @@
-﻿<div class="alert alert-warning alert-dismissible fade show my-2" role="alert" ng-if="mensagemErroPersistencia">
-    <strong>⚠️ Erro de Sincronização:</strong> {{ mensagemErroPersistencia }}
-</div>
-
-@{
+﻿@{
     ViewBag.Title = "Timer Pomodoro";
 }
 
-<div class="text-center" style="margin-top: 20px;" ng-controller="timerController">
+<div class="text-center position-relative mt-4" ng-controller="timerController">
+
+    <div class="alert alert-warning alert-dismissible fade show my-2 text-start" role="alert" ng-if="mensagemErroPersistencia">
+        <strong>⚠️ Erro de Sincronização:</strong> {{ mensagemErroPersistencia }}
+    </div>
+
+    <div class="d-flex gap-2 position-absolute top-0 end-0 m-2">
+
+        <button type="button" class="btn btn-outline-secondary" title="Relatório de Horas" ng-click="abrirModalRelatorio()" data-bs-toggle="modal" data-bs-target="#modalRelatorio">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-calendar3" viewBox="0 0 16 16">
+                <path d="M14 0H2a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2M1 3.857C1 3.384 1.448 3 2 3h12c.552 0 1 .384 1 .857v10.286c0 .473-.448.857-1 .857H2c-.552 0-1-.384-1-.857z" />
+                <path d="M6.5 7a1 1 0 1 0 0-2 1 1 0 0 0 0 2m3 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2m3 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2m-9 3a1 1 0 1 0 0-2 1 1 0 0 0 0 2m3 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2m3 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2m3 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2m-9 3a1 1 0 1 0 0-2 1 1 0 0 0 0 2m3 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2m3 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2" />
+            </svg>
+        </button>
+
+        <a href="@Url.Action("Configuracao", "Home")" class="btn btn-outline-secondary" title="Configurações">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-gear" viewBox="0 0 16 16">
+                <path d="M8 4.754a3.246 3.246 0 1 0 0 6.492 3.246 3.246 0 0 0 0-6.492M5.754 8a2.246 2.246 0 1 1 4.492 0 2.246 2.246 0 0 1-4.492 0" />
+                <path d="M9.796 1.343c-.527-1.79-3.065-1.79-3.592 0l-.094.319a.873.873 0 0 1-1.255.52l-.292-.16c-1.64-.892-3.433.902-2.54 2.541l.159.292a.873.873 0 0 1-.52 1.255l-.319.094c-1.79.527-1.79 3.065 0 3.592l.319.094a.873.873 0 0 1 .52 1.255l-.16.292c-.892 1.64.901 3.434 2.541 2.54l.292-.159a.873.873 0 0 1 1.255.52l.094.319c.527 1.79 3.065 1.79 3.592 0l.094-.319a.873.873 0 0 1 1.255-.52l.292.16c1.64.893 3.434-.902 2.54-2.541l-.159-.292a.873.873 0 0 1 .52-1.255l.319-.094c1.79-.527 1.79-3.065 0-3.592l-.319-.094a.873.873 0 0 1-.52-1.255l.16-.292c.893-1.64-.902-3.433-2.541-2.54l-.292.159a.873.873 0 0 1-1.255-.52zm-2.633.283c.246-.835 1.428-.835 1.674 0l.094.319a1.873 1.873 0 0 0 2.693 1.115l.291-.16c.764-.415 1.6.42 1.184 1.185l-.159.292a1.873 1.873 0 0 0 1.116 2.692l.318.094c.835.246.835 1.428 0 1.674l-.319.094a1.873 1.873 0 0 0-1.115 2.693l.16.291c.415.764-.42 1.6-1.185 1.184l-.291-.159a1.873 1.873 0 0 0-2.693 1.116l-.094.318c-.246.835-1.428.835-1.674 0l-.094-.319a1.873 1.873 0 0 0-2.692-1.115l-.292.16c-.764.415-1.6-.42-1.184-1.185l.159-.291A1.873 1.873 0 0 0 1.945 8.93l-.319-.094c-.835-.246-.835-1.428 0-1.674l.319-.094A1.873 1.873 0 0 0 3.06 4.377l-.16-.292c-.415-.764.42-1.6 1.185-1.184l.292.159a1.873 1.873 0 0 0 2.692-1.115z" />
+            </svg>
+        </a>
+
+    </div>
+
+    <div class="modal fade text-start" id="modalRelatorio" tabindex="-1" aria-labelledby="modalRelatorioLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title fw-bold" id="modalRelatorioLabel">📊 Relatório de Tempo Focado</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row g-3">
+                        <div class="col-6">
+                            <div class="p-3 border rounded text-center bg-light">
+                                <small class="text-muted text-uppercase fw-bold d-block">Hoje</small>
+                                <span class="fs-4 fw-bold text-primary">{{ relatorioHoras.Hoje }}</span>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="p-3 border rounded text-center bg-light">
+                                <small class="text-muted text-uppercase fw-bold d-block">Esta Semana</small>
+                                <span class="fs-4 fw-bold text-success">{{ relatorioHoras.Semana }}</span>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="p-3 border rounded text-center bg-light">
+                                <small class="text-muted text-uppercase fw-bold d-block">Este Mês</small>
+                                <span class="fs-4 fw-bold text-warning">{{ relatorioHoras.Mes }}</span>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="p-3 border rounded text-center bg-light">
+                                <small class="text-muted text-uppercase fw-bold d-block">Este Ano</small>
+                                <span class="fs-4 fw-bold text-info">{{ relatorioHoras.Ano }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <h1 class="display-4">Timer Pomodoro</h1>
 
@@ -39,88 +99,5 @@
         <button class="btn btn-dark btn-lg" ng-click="pausar()">Pausar</button>
         <button class="btn btn-dark btn-lg" ng-click="resetar()">Resetar</button>
     </div>
-
-    <hr />
-
-    <div class="row text-start mt-4">
-
-        <div class="col-md-5 mb-4">
-            <div class="card shadow-sm">
-                <div class="card-header bg-light">
-                    <h5 class="mb-0">{{ novaTarefa.Id === 0 ? 'Nova Tarefa' : 'Editar Tarefa' }}</h5>
-                </div>
-                <div class="card-body">
-                    <form ng-submit="salvarTarefa()">
-                        <div class="mb-3">
-                            <label class="form-label fw-bold">Título</label>
-                            <input type="text" class="form-control" ng-model="novaTarefa.Titulo" required placeholder="Ex: Estudar, Trabalhar...">
-                        </div>
-
-                        <div class="mb-3">
-                            <label class="form-label fw-bold">Descrição</label>
-                            <textarea class="form-control" ng-model="novaTarefa.Descricao" rows="2" placeholder="Detalhes da tarefa..."></textarea>
-                        </div>
-
-                        <div class="row">
-                            <div class="col-4 mb-3">
-                                <label class="form-label small fw-bold">Foco (min)</label>
-                                <input type="number" class="form-control" min="1" max="120" ng-model="novaTarefa.TempoFoco" required>
-                            </div>
-                            <div class="col-4 mb-3">
-                                <label class="form-label small fw-bold">Pausa (min)</label>
-                                <input type="number" class="form-control" min="1" max="60" ng-model="novaTarefa.PausaCurta" required>
-                            </div>
-                            <div class="col-4 mb-3">
-                                <label class="form-label small fw-bold">P. Longa (min)</label>
-                                <input type="number" class="form-control" min="1" max="60" ng-model="novaTarefa.PausaLonga" required>
-                            </div>
-                        </div>
-
-                        <div class="d-flex justify-content-between mt-2">
-                            <button type="button" class="btn btn-outline-secondary" ng-click="limparFormulario()" ng-if="novaTarefa.Id !== 0">Cancelar</button>
-                            <button type="submit" class="btn btn-success w-100 ms-1">Salvar Tarefa</button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-md-7">
-            <div class="card shadow-sm">
-                <div class="card-header bg-light d-flex justify-content-between align-items-center">
-                    <h5 class="mb-0">Suas Tarefas</h5>
-                    <span class="badge bg-secondary">{{ tarefas.length }} cadastrada(s)</span>
-                </div>
-                <ul class="list-group list-group-flush">
-                    <li class="list-group-item d-flex justify-content-between align-items-center"
-                        ng-repeat="t in tarefas track by $index"
-                        ng-class="{'table-active': tarefaAtiva.Id === t.Id}">
-
-                        <div>
-                            <h6 class="mb-1 fw-bold">{{ t.Titulo }}</h6>
-                            <small class="text-muted d-block mb-1" ng-if="t.Descricao">{{ t.Descricao }}</small>
-
-                            <div class="d-flex gap-1 align-items-center">
-                                <span class="badge bg-dark">
-                                    🍅 {{ t.PomodorosConcluidos || 0 }} ciclo(s)
-                                </span>
-                                <span class="badge bg-secondary">⏱️ {{ t.TempoFoco }}m / {{ t.PausaCurta }}m / {{ t.PausaLonga }}m</span>
-                            </div>
-                        </div>
-
-                        <div class="btn-group btn-group-sm">
-                            <button class="btn" ng-class="tarefaAtiva.Id === t.Id ? 'btn-success' : 'btn-primary'" ng-click="selecionarTarefa(t)">
-                                {{ tarefaAtiva.Id === t.Id ? 'Em Foco' : 'Selecionar' }}
-                            </button>
-                            <button class="btn btn-outline-secondary" ng-click="editarTarefa(t)">Editar</button>
-                            <button class="btn btn-outline-danger" ng-click="deletarTarefa(t.Id)">Excluir</button>
-                        </div>
-                    </li>
-                    <li class="list-group-item text-center text-muted py-4" ng-if="tarefas.length === 0">
-                        Nenhuma tarefa criada. Preencha o formulário ao lado para começar.
-                    </li>
-                </ul>
-            </div>
-        </div>
-    </div>
+     
 </div>

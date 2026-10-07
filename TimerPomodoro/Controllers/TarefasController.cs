@@ -122,5 +122,39 @@ namespace TimerPomodoro.Controllers
 				return Json(new { sucesso = false, mensagem = "Falha interna ao salvar sessão de foco no banco de dados." });
 			}
 		}
+
+		[HttpGet]
+		public JsonResult ObterRelatorioHoras()
+		{
+			using (var db = new MeuDbContext())
+			{
+				var relatorio = db.Database
+					.SqlQuery<RelatorioPomodoroDTO>("EXEC dbo.sp_ObterRelatorioPomodoro")
+	 			    .FirstOrDefault() ?? new RelatorioPomodoroDTO();
+
+				return Json(new
+				{
+					Hoje = FormatarHoras(relatorio.MinutosHoje),
+					Semana = FormatarHoras(relatorio.MinutosSemana),
+					Mes = FormatarHoras(relatorio.MinutosMes),
+					Ano = FormatarHoras(relatorio.MinutosAno)
+				}, JsonRequestBehavior.AllowGet);
+			}
+		}
+
+		public class RelatorioPomodoroDTO
+		{
+			public int MinutosHoje { get; set; }
+			public int MinutosSemana { get; set; }
+			public int MinutosMes { get; set; }
+			public int MinutosAno { get; set; }
+		}
+
+		private string FormatarHoras(int totalMinutos)
+		{
+			int horas = totalMinutos / 60;
+			int minutos = totalMinutos % 60;
+			return $"{horas}h {minutos}m";
+		}
 	}
 }
