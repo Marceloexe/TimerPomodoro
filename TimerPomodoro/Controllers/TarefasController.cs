@@ -1,5 +1,5 @@
-﻿using TimerPomodoro.Models;
-using System;
+﻿using System;
+using System.Data.SqlClient;
 using System.Diagnostics;
 using System.Linq;
 using System.Web.Mvc;
@@ -109,7 +109,7 @@ namespace TimerPomodoro.Controllers
 
 				sessao.DuracaoMinutos = (int)(sessao.DataFim - sessao.DataInicio).TotalMinutes;
 				db.SessoesFoco.Add(sessao);
-				tarefa.PomodorosConcluidos += 1; 
+				tarefa.PomodorosConcluidos += 1;
 
 				db.SaveChanges();
 				return Json(new { sucesso = true, pomodorosConcluidos = tarefa.PomodorosConcluidos });
@@ -124,30 +124,39 @@ namespace TimerPomodoro.Controllers
 		}
 
 		[HttpGet]
-		public JsonResult ObterRelatorioHoras()
+		public JsonResult ObterRelatorioHoras(DateTime? dataInicio, DateTime? dataFim)
 		{
-			using (var db = new MeuDbContext())
+			DateTime inicio = dataInicio?.Date ?? DateTime.Today;
+			DateTime fim = dataFim?.Date.AddDays(1).AddTicks(-1) ?? DateTime.Today.AddDays(1).AddTicks(-1);
+
+			using (var dbContext = new MeuDbContext())
 			{
-				var relatorio = db.Database
-					.SqlQuery<RelatorioPomodoroDTO>("EXEC dbo.sp_ObterRelatorioPomodoro")
-	 			    .FirstOrDefault() ?? new RelatorioPomodoroDTO();
+				var pInicio1 = new SqlParameter("@DataInicio", inicio);
+				var pFim1 = new SqlParameter("@DataFim", fim);
+
+				var resumo = dbContext.Database
+									  .SqlQuery<RelatorioResumoDTO>("EXEC dbo.sp_ObterRelatorioResumo @DataInicio, @DataFim", pInicio1, pFim1)
+									  .FirstOrDefault() ?? new RelatorioResumoDTO();
+
+				var pInicio2 = new SqlParameter("@DataInicio", inicio);
+				var pFim2 = new SqlParameter("@DataFim", fim);
+
+				var tarefas = dbContext.Database
+									   .SqlQuery<RelatorioTarefaDTO>("EXEC dbo.sp_ObterRelatorioPorTarefa @DataInicio, @DataFim", pInicio2, pFim2)
+									   .ToList();
 
 				return Json(new
 				{
-					Hoje = FormatarHoras(relatorio.MinutosHoje),
-					Semana = FormatarHoras(relatorio.MinutosSemana),
-					Mes = FormatarHoras(relatorio.MinutosMes),
-					Ano = FormatarHoras(relatorio.MinutosAno)
+					TotalPomodoros = resumo.TotalPomodoros,
+					TempoTotal = FormatarHoras(resumo.TempoTotalMinutos),
+					DetalhamentoTarefas = tarefas.Select(t => new
+					{
+						t.NomeTarefa,
+						t.PomodorosConcluidos,
+						TempoTotal = FormatarHoras(t.TempoTotalMinutos)
+					})
 				}, JsonRequestBehavior.AllowGet);
 			}
-		}
-
-		public class RelatorioPomodoroDTO
-		{
-			public int MinutosHoje { get; set; }
-			public int MinutosSemana { get; set; }
-			public int MinutosMes { get; set; }
-			public int MinutosAno { get; set; }
 		}
 
 		private string FormatarHoras(int totalMinutos)
@@ -156,5 +165,18 @@ namespace TimerPomodoro.Controllers
 			int minutos = totalMinutos % 60;
 			return $"{horas}h {minutos}m";
 		}
+	}
+
+	public class RelatorioResumoDTO
+	{
+		public int TotalPomodoros { get; set; }
+		public int TempoTotalMinutos { get; set; }
+	}
+
+	public class RelatorioTarefaDTO
+	{
+		public string NomeTarefa { get; set; }
+		public int PomodorosConcluidos { get; set; }
+		public int TempoTotalMinutos { get; set; }
 	}
 }

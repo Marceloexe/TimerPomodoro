@@ -25,17 +25,40 @@ app.controller('timerController', function ($scope, $interval, $http, $timeout, 
     $scope.tarefaAtiva = null;
     $scope.mensagemErroPersistencia = null;
 
-    $scope.relatorioHoras = { Hoje: '0h 0m', Semana: '0h 0m', Mes: '0h 0m', Ano: '0h 0m' };
+    // --- RECURSOS DO RELATÓRIO ---
+    // Inicializa o filtro de data padrão com HOJE (conforme requisito do escopo)
+    var hoje = new Date();
+    $scope.filtroRelatorio = {
+        dataInicio: hoje,
+        dataFim: hoje
+    };
+
+    $scope.relatorioData = {
+        TotalPomodoros: 0,
+        TempoTotal: '0h 0m',
+        DetalhamentoTarefas: []
+    };
 
     $scope.abrirModalRelatorio = function () {
-        $http.get('/Tarefas/ObterRelatorioHoras').then(function (response) {
+        $scope.buscarRelatorio();
+    };
+
+    $scope.buscarRelatorio = function () {
+        // Formata as datas para YYYY-MM-DD caso existam
+        var inicioStr = $scope.filtroRelatorio.dataInicio ? new Date($scope.filtroRelatorio.dataInicio).toISOString().split('T')[0] : '';
+        var fimStr = $scope.filtroRelatorio.dataFim ? new Date($scope.filtroRelatorio.dataFim).toISOString().split('T')[0] : '';
+
+        $http.get('/Tarefas/ObterRelatorioHoras', {
+            params: { dataInicio: inicioStr, dataFim: fimStr }
+        }).then(function (response) {
             if (response.data) {
-                $scope.relatorioHoras = response.data;
+                $scope.relatorioData = response.data;
             }
         }).catch(function (err) {
-            console.error('Erro ao carregar relatório de horas:', err);
+            console.error('Erro ao carregar relatório de produtividade:', err);
         });
     };
+    // ------------------------------
 
     var tarefaSalva = localStorage.getItem('tarefaAtiva');
     if (tarefaSalva) {
