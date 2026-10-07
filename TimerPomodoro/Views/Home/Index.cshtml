@@ -4,12 +4,10 @@
 
 <div class="text-center position-relative mt-4" ng-controller="timerController">
 
-    <!-- Mensagem de Erro -->
     <div class="alert alert-warning alert-dismissible fade show my-2 text-start" role="alert" ng-if="mensagemErroPersistencia">
         <strong>⚠️ Erro de Sincronização:</strong> {{ mensagemErroPersistencia }}
     </div>
 
-    <!-- Botões Superiores (Relatório e Configurações) -->
     <div class="d-flex gap-2 position-absolute top-0 end-0 m-2">
         <button type="button" class="btn btn-outline-secondary" title="Relatório de Produtividade" ng-click="abrirModalRelatorio()" data-bs-toggle="modal" data-bs-target="#modalRelatorio">
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-calendar3" viewBox="0 0 16 16">
@@ -26,7 +24,6 @@
         </a>
     </div>
 
-    <!-- Modal do Relatório de Produtividade -->
     <div class="modal fade text-start" id="modalRelatorio" tabindex="-1" aria-labelledby="modalRelatorioLabel" aria-hidden="true">
         <div class="modal-dialog modal-lg modal-dialog-centered">
             <div class="modal-content">
@@ -36,7 +33,6 @@
                 </div>
                 <div class="modal-body">
 
-                    <!-- Seletor de Período -->
                     <div class="row g-2 mb-4 align-items-end bg-light p-3 rounded border">
                         <div class="col-md-5">
                             <label class="form-label fw-bold small text-muted">Data Início</label>
@@ -51,7 +47,6 @@
                         </div>
                     </div>
 
-                    <!-- Resumo do Período -->
                     <div class="row g-3 mb-4">
                         <div class="col-6">
                             <div class="p-3 border rounded text-center bg-light">
@@ -67,7 +62,6 @@
                         </div>
                     </div>
 
-                    <!-- Detalhamento por Tarefa -->
                     <h6 class="fw-bold mb-2">Detalhamento por Tarefa</h6>
                     <div class="table-responsive">
                         <table class="table table-hover border align-middle">
@@ -99,7 +93,6 @@
         </div>
     </div>
 
-    <!-- Timer Principal e Controles -->
     <h1 class="display-4">Timer Pomodoro</h1>
 
     <div class="alert alert-primary d-inline-block px-4 py-2 my-2 shadow-sm" ng-if="tarefaAtiva">
