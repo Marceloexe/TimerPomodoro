@@ -54,7 +54,7 @@ graph TD
 
 [x] Registro de sessões no banco de dados (SQL Server)
 
-[ ] Histórico e relatório de produtividade do usuário
+[x] Histórico e relatório de produtividade do usuário
 
 [ ] Personalização do tempo de cada ciclo
 
