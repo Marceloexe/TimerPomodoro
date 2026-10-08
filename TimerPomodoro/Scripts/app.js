@@ -16,7 +16,7 @@ app.controller('timerController', function ($scope, $interval, $http, $timeout, 
 
     var promessaTimer;
     var ciclosCompletados = 0;
-    var tocadorDeAudio = new Audio('/despertador-iphone.mp3');
+    var tocadorDeAudio = new Audio((window.pomodoroBaseUrl || '/') + 'despertador-iphone.mp3');
     var dataInicioSessaoAtual = null;
 
     $scope.tempoAtual = TEMPO_FOCO;
@@ -45,7 +45,7 @@ app.controller('timerController', function ($scope, $interval, $http, $timeout, 
         var inicioStr = $scope.filtroRelatorio.dataInicio ? new Date($scope.filtroRelatorio.dataInicio).toISOString().split('T')[0] : '';
         var fimStr = $scope.filtroRelatorio.dataFim ? new Date($scope.filtroRelatorio.dataFim).toISOString().split('T')[0] : '';
 
-        $http.get('/Tarefas/ObterRelatorioHoras', {
+        $http.get((window.pomodoroBaseUrl || '/') + 'Tarefas/ObterRelatorioHoras', {
             params: { dataInicio: inicioStr, dataFim: fimStr }
         }).then(function (response) {
             if (response.data) {
@@ -87,7 +87,7 @@ app.controller('timerController', function ($scope, $interval, $http, $timeout, 
     };
 
     $scope.carregarTarefas = function () {
-        $http.get('/Tarefas/Listar').then(function (response) {
+        $http.get((window.pomodoroBaseUrl || '/') + 'Tarefas/Listar').then(function (response) {
             if (response.data && Array.isArray(response.data)) {
                 $scope.tarefas = response.data;
             }
@@ -95,11 +95,11 @@ app.controller('timerController', function ($scope, $interval, $http, $timeout, 
             console.error('[ERRO API] Falha ao carregar lista de tarefas:', error);
         });
     };
-     
+
     $scope.salvarTarefa = function () {
         if (!$scope.novaTarefa.Titulo) return;
 
-        $http.post('/Tarefas/Salvar', $scope.novaTarefa).then(function (response) {
+        $http.post((window.pomodoroBaseUrl || '/') + 'Tarefas/Salvar', $scope.novaTarefa).then(function (response) {
             $scope.carregarTarefas();
             $scope.limparFormulario();
         }).catch(function (err) {
@@ -123,7 +123,7 @@ app.controller('timerController', function ($scope, $interval, $http, $timeout, 
 
     $scope.deletarTarefa = function (id) {
         if (confirm("Deseja eliminar esta tarefa?")) {
-            $http.post('/Tarefas/Excluir/' + id).then(function () {
+            $http.post((window.pomodoroBaseUrl || '/') + 'Tarefas/Excluir/' + id).then(function () {
                 if ($scope.tarefaAtiva && $scope.tarefaAtiva.Id === id) {
                     $scope.tarefaAtiva = null;
                     localStorage.removeItem('tarefaAtiva');
@@ -166,7 +166,7 @@ app.controller('timerController', function ($scope, $interval, $http, $timeout, 
 
         $scope.tarefaAtiva.PomodorosConcluidos = ($scope.tarefaAtiva.PomodorosConcluidos || 0) + 1;
 
-        $http.post('/Tarefas/SalvarSessao', payloadSessao)
+        $http.post((window.pomodoroBaseUrl || '/') + 'Tarefas/SalvarSessao', payloadSessao)
             .then(function (res) {
                 if (res.data && res.data.sucesso) {
                     $scope.tarefaAtiva.PomodorosConcluidos = res.data.pomodorosConcluidos;
@@ -212,7 +212,17 @@ app.controller('timerController', function ($scope, $interval, $http, $timeout, 
         atualizarTela();
     }
 
+    $scope.mudarFase = function (fase) {
+        $scope.pausar();
+        dataInicioSessaoAtual = null;
+        $scope.faseAtual = fase;
+        $scope.tempoAtual = fase === "Foco" ? TEMPO_FOCO : fase === "Pausa Curta" ? TEMPO_PAUSA_CURTA : TEMPO_PAUSA_LONGA;
+        atualizarTela();
+    };
+
     function atualizarTela() {
+        var total = $scope.faseAtual === "Foco" ? TEMPO_FOCO : $scope.faseAtual === "Pausa Curta" ? TEMPO_PAUSA_CURTA : TEMPO_PAUSA_LONGA;
+        $scope.progressoTimer = Math.max(0.04, Math.min(1, (total - $scope.tempoAtual) / total)) * 805;
         var minutos = Math.floor($scope.tempoAtual / 60);
         var segundos = $scope.tempoAtual % 60;
         $scope.tempoFormatado = (minutos < 10 ? "0" : "") + minutos + ":" + (segundos < 10 ? "0" : "") + segundos;

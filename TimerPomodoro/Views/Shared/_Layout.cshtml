@@ -1,30 +1,90 @@
-﻿<!DOCTYPE html>
-<html ng-app="pomodoroApp">
+﻿@{
+    var acao = (string)ViewContext.RouteData.Values["action"];
+    var emTarefas = acao == "Configuracao";
+}
+<!DOCTYPE html>
+<html lang="pt-BR" ng-app="pomodoroApp">
 <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>@ViewBag.Title - My ASP.NET Application</title>
-    @Styles.Render("~/Content/css")
-    @Scripts.Render("~/bundles/modernizr")
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>@ViewBag.Title - Timer Pomodoro</title>
+    <link href="@Url.Content("~/Content/pomodoro.css")" rel="stylesheet" />
+    <script>try { document.documentElement.dataset.theme = localStorage.getItem('tema') || 'light'; } catch (e) { }</script>
 </head>
-<body>
-    <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-dark bg-dark">
-    </nav>
-    <div class="container body-content">
+<body ng-controller="timerController" ng-cloak>
+
+    <!-- sprite de ícones: use com <svg class="i"><use href="#i-nome"/></svg> -->
+    <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+        <symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4" /><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4" /></symbol>
+        <symbol id="i-moon" viewBox="0 0 24 24"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z" /></symbol>
+        <symbol id="i-gear" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3" /><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z" /></symbol>
+        <symbol id="i-briefcase" viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2" fill="currentColor" /><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2" /></symbol>
+        <symbol id="i-target" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8" /><circle cx="12" cy="12" r="3" /><path d="M12 1v4M12 19v4M1 12h4M19 12h4" /></symbol>
+        <symbol id="i-pause" viewBox="0 0 24 24"><path d="M9 5v14M15 5v14" stroke-width="3.2" /></symbol>
+        <symbol id="i-pause-solid" viewBox="0 0 24 24"><path d="M8 5v14M16 5v14" stroke-width="3.5" /></symbol>
+        <symbol id="i-play" viewBox="0 0 24 24"><path d="M6 4l14 8-14 8z" fill="currentColor" /></symbol>
+        <symbol id="i-refresh" viewBox="0 0 24 24"><path d="M21 12a9 9 0 1 1-2.6-6.4" /><path d="M21 3v6h-6" /></symbol>
+        <symbol id="i-list-plus" viewBox="0 0 24 24"><path d="M3 6h12M3 12h8M3 18h8M18 13v8M14 17h8" /></symbol>
+        <symbol id="i-list" viewBox="0 0 24 24"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01" stroke-width="2.6" /></symbol>
+        <symbol id="i-file" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" /><path d="M14 2v6h6M8 13h8M8 17h8" stroke-width="1.6" /></symbol>
+        <symbol id="i-plus-circle" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="currentColor" /><path d="M12 8v8M8 12h8" stroke="#16994a" stroke-width="2.6" /></symbol>
+        <symbol id="i-clipboard" viewBox="0 0 24 24"><rect x="5" y="4" width="14" height="18" rx="2" /><path d="M9 4V3a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v1M9 4h6v3H9zM9 12h.01M9 16h.01M12.5 12H16M12.5 16H16" stroke-width="2" /></symbol>
+        <symbol id="i-calendar" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" /><path d="M16 2v4M8 2v4M3 10h18M8 14h2M14 14h2M8 18h2M14 18h2" stroke-width="1.8" /></symbol>
+        <symbol id="i-x" viewBox="0 0 24 24"><path d="M5 5l14 14M19 5L5 19" stroke-width="1.8" /></symbol>
+    </svg>
+
+    <header>
+        <a class="brand" href="@Url.Action("Index", "Home")"><span class="t">🍅</span> Timer Pomodoro</a>
+        <div class="actions">
+            <button type="button" class="icon-btn" id="themeBtn" aria-label="Alternar tema">
+                <svg class="i ico-sun"><use href="#i-sun" /></svg>
+                <svg class="i ico-moon"><use href="#i-moon" /></svg>
+            </button>
+            <button type="button" class="icon-btn" id="repBtn" aria-label="Relatório de produtividade">
+                <svg class="i"><use href="#i-calendar" /></svg>
+            </button>
+            <a class="icon-btn @(emTarefas ? "on" : "")" href="@Url.Action(emTarefas ? "Index" : "Configuracao", "Home")" aria-label="Tarefas e configurações">
+                <svg class="i"><use href="#i-gear" /></svg>
+            </a>
+        </div>
+    </header>
+
+    <main>
         @RenderBody()
-        <hr />
-        <footer>
-            <p align="center">&copy; @DateTime.Now.Year - Timer Pomodoro</p>
-        </footer>
+    </main>
+
+
+    <!-- Modal: Relatório de Produtividade -->
+    <div class="modal" id="reportModal" aria-hidden="true" data-url="@Url.Action("ObterRelatorioHoras", "Tarefas")">
+        <div class="dialog" role="dialog" aria-modal="true" aria-labelledby="repTitle">
+            <div class="mh">
+                <h3 id="repTitle">📊 Relatório de Produtividade</h3>
+                <button type="button" class="x" id="repX" aria-label="Fechar"><svg class="i"><use href="#i-x" /></svg></button>
+            </div>
+            <div class="mb">
+                <div class="filters">
+                    <div><label for="repIni">Data Início</label><input type="date" id="repIni" /></div>
+                    <div><label for="repFim">Data Fim</label><input type="date" id="repFim" /></div>
+                    <button type="button" class="btn-blue" id="repFiltrar">Filtrar</button>
+                </div>
+                <div class="stats">
+                    <div class="stat"><small>Pomodoros concluídos</small><strong>🍅 <span class="n" id="repQtd">0</span></strong></div>
+                    <div class="stat"><small>Tempo total focado</small><strong class="tm" id="repTempo">0h 0m</strong></div>
+                </div>
+                <h4>Detalhamento por Tarefa</h4>
+                <table class="rep">
+                    <thead><tr><th>Tarefa</th><th>Pomodoros</th><th>Tempo Total</th></tr></thead>
+                    <tbody id="repBody"><tr><td colspan="3" class="none">Nenhum registro encontrado para o período selecionado.</td></tr></tbody>
+                </table>
+            </div>
+            <div class="mf"><button type="button" class="btn-close" id="repFechar">Fechar</button></div>
+        </div>
     </div>
 
-    @Scripts.Render("~/bundles/jquery")
-    @Scripts.Render("~/bundles/bootstrap")
-
-    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
-
-    <script src="~/Scripts/app.js"></script>
-
+    <script>window.pomodoroBaseUrl = '@Url.Content("~/")';</script>
+    <script src="@Url.Content("~/Scripts/angular.min.js")"></script>
+    <script src="@Url.Content("~/Scripts/app.js")"></script>
+    <script src="@Url.Content("~/Scripts/pomodoro.js")"></script>
     @RenderSection("scripts", required: false)
 </body>
 </html>

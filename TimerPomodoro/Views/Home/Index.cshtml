@@ -1,128 +1,41 @@
-﻿@{
-    ViewBag.Title = "Timer Pomodoro";
-}
+﻿@{ ViewBag.Title = "Timer"; }
+<section class="view active">
+    <svg class="blob l" viewBox="0 0 240 190" preserveAspectRatio="none"><path d="M0 40C40 70 70 110 110 160C130 182 150 190 240 190H0Z" fill="var(--blob)" /></svg>
+    <svg class="blob r" viewBox="0 0 260 150" preserveAspectRatio="none"><path d="M260 20C200 30 130 70 70 150H260Z" fill="var(--blob)" /></svg>
 
-<div class="text-center position-relative mt-4" ng-controller="timerController">
-
-    <div class="alert alert-warning alert-dismissible fade show my-2 text-start" role="alert" ng-if="mensagemErroPersistencia">
-        <strong>⚠️ Erro de Sincronização:</strong> {{ mensagemErroPersistencia }}
-    </div>
-
-    <div class="d-flex gap-2 position-absolute top-0 end-0 m-2">
-        <button type="button" class="btn btn-outline-secondary" title="Relatório de Produtividade" ng-click="abrirModalRelatorio()" data-bs-toggle="modal" data-bs-target="#modalRelatorio">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-calendar3" viewBox="0 0 16 16">
-                <path d="M14 0H2a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2M1 3.857C1 3.384 1.448 3 2 3h12c.552 0 1 .384 1 .857v10.286c0 .473-.448.857-1 .857H2c-.552 0-1-.384-1-.857z" />
-                <path d="M6.5 7a1 1 0 1 0 0-2 1 1 0 0 0 0 2m3 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2m3 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2m-9 3a1 1 0 1 0 0-2 1 1 0 0 0 0 2m3 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2m3 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2m3 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2m-9 3a1 1 0 1 0 0-2 1 1 0 0 0 0 2m3 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2m3 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2" />
-            </svg>
-        </button>
-
-        <a href="@Url.Action("Configuracao", "Home")" class="btn btn-outline-secondary" title="Configurações">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-gear" viewBox="0 0 16 16">
-                <path d="M8 4.754a3.246 3.246 0 1 0 0 6.492 3.246 3.246 0 0 0 0-6.492M5.754 8a2.246 2.246 0 1 1 4.492 0 2.246 2.246 0 0 1-4.492 0" />
-                <path d="M9.796 1.343c-.527-1.79-3.065-1.79-3.592 0l-.094.319a.873.873 0 0 1-1.255.52l-.292-.16c-1.64-.892-3.433.902-2.54 2.541l.159.292a.873.873 0 0 1-.52 1.255l-.319.094c-1.79.527-1.79 3.065 0 3.592l.319.094a.873.873 0 0 1 .52 1.255l-.16.292c-.892 1.64.901 3.434 2.541 2.54l.292-.159a.873.873 0 0 1 1.255.52l.094.319c.527 1.79 3.065 1.79 3.592 0l.094-.319a.873.873 0 0 1 1.255-.52l.292.16c1.64.893 3.434-.902 2.54-2.541l-.159-.292a.873.873 0 0 1 .52-1.255l.319-.094c1.79-.527 1.79-3.065 0-3.592l-.319-.094a.873.873 0 0 1-.52-1.255l.16-.292c.893-1.64-.902-3.433-2.541-2.54l-.292.159a.873.873 0 0 1-1.255-.52zm-2.633.283c.246-.835 1.428-.835 1.674 0l.094.319a1.873 1.873 0 0 0 2.693 1.115l.291-.16c.764-.415 1.6.42 1.184 1.185l-.159.292a1.873 1.873 0 0 0 1.116 2.692l.318.094c.835.246.835 1.428 0 1.674l-.319.094a1.873 1.873 0 0 0-1.115 2.693l.16.291c.415.764-.42 1.6-1.185 1.184l-.291-.159a1.873 1.873 0 0 0-2.693 1.116l-.094.318c-.246.835-1.428.835-1.674 0l-.094-.319a1.873 1.873 0 0 0-2.692-1.115l-.292.16c-.764.415-1.6-.42-1.184-1.185l.159-.291A1.873 1.873 0 0 0 1.945 8.93l-.319-.094c-.835-.246-.835-1.428 0-1.674l.319-.094A1.873 1.873 0 0 0 3.06 4.377l-.16-.292c-.415-.764.42-1.6 1.185-1.184l.292.159a1.873 1.873 0 0 0 2.692-1.115z" />
-            </svg>
-        </a>
-    </div>
-
-    <div class="modal fade text-start" id="modalRelatorio" tabindex="-1" aria-labelledby="modalRelatorioLabel" aria-hidden="true">
-        <div class="modal-dialog modal-lg modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title fw-bold" id="modalRelatorioLabel">📊 Relatório de Produtividade</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
-                </div>
-                <div class="modal-body">
-
-                    <div class="row g-2 mb-4 align-items-end bg-light p-3 rounded border">
-                        <div class="col-md-5">
-                            <label class="form-label fw-bold small text-muted">Data Início</label>
-                            <input type="date" class="form-control" ng-model="filtroRelatorio.dataInicio">
-                        </div>
-                        <div class="col-md-5">
-                            <label class="form-label fw-bold small text-muted">Data Fim</label>
-                            <input type="date" class="form-control" ng-model="filtroRelatorio.dataFim">
-                        </div>
-                        <div class="col-md-2">
-                            <button type="button" class="btn btn-primary w-100" ng-click="buscarRelatorio()">Filtrar</button>
-                        </div>
-                    </div>
-
-                    <div class="row g-3 mb-4">
-                        <div class="col-6">
-                            <div class="p-3 border rounded text-center bg-light">
-                                <small class="text-muted text-uppercase fw-bold d-block">Pomodoros Concluídos</small>
-                                <span class="fs-3 fw-bold text-primary">🍅 {{ relatorioData.TotalPomodoros || 0 }}</span>
-                            </div>
-                        </div>
-                        <div class="col-6">
-                            <div class="p-3 border rounded text-center bg-light">
-                                <small class="text-muted text-uppercase fw-bold d-block">Tempo Total Focado</small>
-                                <span class="fs-3 fw-bold text-success">{{ relatorioData.TempoTotal || '0h 0m' }}</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <h6 class="fw-bold mb-2">Detalhamento por Tarefa</h6>
-                    <div class="table-responsive">
-                        <table class="table table-hover border align-middle">
-                            <thead class="table-light">
-                                <tr>
-                                    <th>Tarefa</th>
-                                    <th class="text-center">Pomodoros</th>
-                                    <th class="text-end">Tempo Total</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr ng-repeat="item in relatorioData.DetalhamentoTarefas">
-                                    <td class="fw-bold">{{ item.NomeTarefa }}</td>
-                                    <td class="text-center"><span class="badge bg-secondary">{{ item.PomodorosConcluidos }}</span></td>
-                                    <td class="text-end fw-bold text-primary">{{ item.TempoTotal }}</td>
-                                </tr>
-                                <tr ng-if="!relatorioData.DetalhamentoTarefas || relatorioData.DetalhamentoTarefas.length === 0">
-                                    <td colspan="3" class="text-center text-muted py-3">Nenhum registro encontrado para o período selecionado.</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
-                </div>
+    <div class="timer-wrap">
+        <div class="now">
+            <span class="ic"><svg class="i"><use href="#i-briefcase" /></svg></span>
+            <div>
+                <small>Trabalhando em agora:</small>
+                <div class="row"><b id="nowTitle">{{ tarefaAtiva.Titulo || 'Nenhuma tarefa' }}</b><span>🍅 <span id="nowCycles">{{ tarefaAtiva.PomodorosConcluidos || 0 }}</span> ciclo(s)</span></div>
             </div>
         </div>
-    </div>
 
-    <h1 class="display-4">Timer Pomodoro</h1>
-
-    <div class="alert alert-primary d-inline-block px-4 py-2 my-2 shadow-sm" ng-if="tarefaAtiva">
-        <small class="text-uppercase fw-bold text-muted d-block">Trabalhando em agora:</small>
-        <strong>{{ tarefaAtiva.Titulo }}</strong>
-        <span class="badge bg-dark ms-2">🍅 {{ tarefaAtiva.PomodorosConcluidos || 0 }} ciclo(s)</span>
-    </div>
-    <div class="alert alert-light d-inline-block px-4 py-2 my-2 border" ng-if="!tarefaAtiva">
-        <small class="text-muted">Nenhuma tarefa selecionada. Escolha uma abaixo para carregar os seus tempos.</small>
-    </div>
-
-    <div style="font-size: 6rem; font-weight: bold;">{{ tempoFormatado }}</div>
-    <h3 class="text-muted mb-3">{{ faseAtual }}</h3>
-
-    <div class="d-flex justify-content-center gap-2 my-3">
-        <div class="p-3 border rounded shadow-sm" ng-class="faseAtual === 'Foco' ? 'bg-primary text-white' : 'bg-white text-dark'">
-            Foco ({{ tempoFocoCustom }}min)
+        <div class="dial">
+            <svg class="ring" viewBox="0 0 264 264" width="264" height="264">
+                <circle cx="132" cy="132" r="128" fill="none" stroke="var(--ring)" stroke-width="5" />
+                <circle id="prog" cx="132" cy="132" r="128" fill="none" stroke="var(--blue)" stroke-width="7" stroke-linecap="round" ng-attr-stroke-dasharray="{{ progressoTimer }} 805" />
+            </svg>
+            <div class="face">
+                <div class="time" id="time">{{ tempoFormatado }}</div>
+                <div class="mode" id="modeLabel">{{ faseAtual }}</div>
+            </div>
         </div>
-        <div class="p-3 border rounded shadow-sm" ng-class="faseAtual === 'Pausa Curta' ? 'bg-warning text-dark' : 'bg-white text-dark'">
-            Pausa Curta ({{ pausaCurtaCustom }}min)
+
+        <div class="modes" id="modes">
+            <button type="button" ng-click="mudarFase('Foco')" ng-class="{sel: faseAtual === 'Foco'}"><span class="ic"><svg class="i"><use href="#i-target" /></svg></span><span>Foco</span><b id="mFocus">{{ tempoFocoCustom }} min</b></button>
+            <button type="button" ng-click="mudarFase('Pausa Curta')" ng-class="{sel: faseAtual === 'Pausa Curta'}"><span class="ic"><svg class="i"><use href="#i-pause" /></svg></span><span>Pausa Curta</span><b id="mShort">{{ pausaCurtaCustom }} min</b></button>
+            <button type="button" ng-click="mudarFase('Pausa Longa')" ng-class="{sel: faseAtual === 'Pausa Longa'}"><span class="ic"><svg class="i"><use href="#i-moon" /></svg></span><span>Pausa Longa</span><b id="mLong">{{ pausaLongaCustom }} min</b></button>
         </div>
-        <div class="p-3 border rounded shadow-sm" ng-class="faseAtual === 'Pausa Longa' ? 'bg-info text-white' : 'bg-white text-dark'">
-            Pausa Longa ({{ pausaLongaCustom }}min)
+
+        <p class="integration-error" role="alert" ng-if="mensagemErroPersistencia">{{ mensagemErroPersistencia }}</p>
+        <div class="ctrls">
+            <button type="button" class="btn go" id="start" ng-click="iniciar()"><svg class="i"><use href="#i-play" /></svg>Iniciar</button>
+            <button type="button" class="btn pause" id="pause" ng-click="pausar()"><svg class="i"><use href="#i-pause-solid" /></svg>Pausar</button>
+            <button type="button" class="btn reset" id="reset" ng-click="resetar()"><svg class="i"><use href="#i-refresh" /></svg>Resetar</button>
         </div>
     </div>
 
-    <div class="mb-5">
-        <button class="btn btn-dark btn-lg" ng-click="iniciar()">Iniciar</button>
-        <button class="btn btn-dark btn-lg" ng-click="pausar()">Pausar</button>
-        <button class="btn btn-dark btn-lg" ng-click="resetar()">Resetar</button>
-    </div>
-
-</div>
+    <footer class="plain" style="margin-top:auto;padding-top:44px">© @DateTime.Now.Year - Timer Pomodoro</footer>
+</section>
