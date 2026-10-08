@@ -25,8 +25,6 @@ app.controller('timerController', function ($scope, $interval, $http, $timeout, 
     $scope.tarefaAtiva = null;
     $scope.mensagemErroPersistencia = null;
 
-    // --- RECURSOS DO RELATÓRIO ---
-    // Inicializa o filtro de data padrão com HOJE (conforme requisito do escopo)
     var hoje = new Date();
     $scope.filtroRelatorio = {
         dataInicio: hoje,
@@ -44,7 +42,6 @@ app.controller('timerController', function ($scope, $interval, $http, $timeout, 
     };
 
     $scope.buscarRelatorio = function () {
-        // Formata as datas para YYYY-MM-DD caso existam
         var inicioStr = $scope.filtroRelatorio.dataInicio ? new Date($scope.filtroRelatorio.dataInicio).toISOString().split('T')[0] : '';
         var fimStr = $scope.filtroRelatorio.dataFim ? new Date($scope.filtroRelatorio.dataFim).toISOString().split('T')[0] : '';
 
@@ -58,7 +55,6 @@ app.controller('timerController', function ($scope, $interval, $http, $timeout, 
             console.error('Erro ao carregar relatório de produtividade:', err);
         });
     };
-    // ------------------------------
 
     var tarefaSalva = localStorage.getItem('tarefaAtiva');
     if (tarefaSalva) {
@@ -99,7 +95,7 @@ app.controller('timerController', function ($scope, $interval, $http, $timeout, 
             console.error('[ERRO API] Falha ao carregar lista de tarefas:', error);
         });
     };
-
+     
     $scope.salvarTarefa = function () {
         if (!$scope.novaTarefa.Titulo) return;
 
