@@ -1,0 +1,66 @@
+@{
+    ViewBag.Title = "Tarefas";
+
+
+    var tarefas = (ViewBag.Tarefas as IEnumerable<dynamic>) ?? Enumerable.Empty<dynamic>();
+    int total = tarefas.Count();
+}
+
+<section class="view active">
+    <div class="tasks-wrap">
+
+        <div class="card">
+            <div class="hd"><h2><svg class="i"><use href="#i-list-plus" /></svg>Nova Tarefa</h2></div>
+
+            @* Ajuste a action/controller para a que você já tem. Os names batem com: Titulo, Descricao, Foco, PausaCurta, PausaLonga *@
+            @using (Html.BeginForm("SalvarTarefa", "Home", FormMethod.Post, new { @class = "form" }))
+            {
+                @Html.AntiForgeryToken()
+
+                <label for="Titulo">Título</label>
+                <div class="field"><svg class="i"><use href="#i-file" /></svg><input id="Titulo" name="Titulo" placeholder="Ex: Estudar, Trabalhar..." required /></div>
+
+                <label for="Descricao">Descrição</label>
+                <div class="field"><svg class="i"><use href="#i-file" /></svg><textarea id="Descricao" name="Descricao" placeholder="Detalhes da tarefa..."></textarea></div>
+
+                <div class="trio">
+                    <div><label for="Foco">Foco (min)</label><div class="field"><svg class="i"><use href="#i-target" /></svg><input id="Foco" name="Foco" type="number" min="1" value="25" /></div></div>
+                    <div><label for="PausaCurta">Pausa (min)</label><div class="field"><svg class="i"><use href="#i-pause" /></svg><input id="PausaCurta" name="PausaCurta" type="number" min="1" value="5" /></div></div>
+                    <div><label for="PausaLonga">P. Longa (min)</label><div class="field"><svg class="i"><use href="#i-moon" /></svg><input id="PausaLonga" name="PausaLonga" type="number" min="1" value="15" /></div></div>
+                </div>
+
+                <button class="save" type="submit"><svg class="i"><use href="#i-plus-circle" /></svg>Salvar</button>
+            }
+        </div>
+
+        <div class="card">
+            <div class="hd"><h2><svg class="i"><use href="#i-list" /></svg>Suas Tarefas</h2><span class="badge">@total cadastrada(s)</span></div>
+            <div class="sep"></div>
+
+            @if (total == 0)
+            {
+                <div class="empty">
+                    <div class="circle"><svg class="i"><use href="#i-clipboard" /></svg></div>
+                    <strong>Nenhuma tarefa criada.</strong>
+                    <p>Preencha o formulário ao lado para começar.</p>
+                </div>
+            }
+            else
+            {
+                <ul class="list">
+                    @foreach (var t in tarefas)
+                    {
+                        <li>
+                            <div>
+                                <b>@t.Titulo</b>
+                                <small class="t-meta">@t.Foco / @t.PausaCurta / @t.PausaLonga min</small>
+                            </div>
+                        </li>
+                    }
+                </ul>
+            }
+        </div>
+    </div>
+
+    <footer class="line">© @DateTime.Now.Year - Timer Pomodoro</footer>
+</section>
