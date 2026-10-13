@@ -135,15 +135,15 @@ namespace TimerPomodoro.Controllers
 				var pFim1 = new SqlParameter("@DataFim", fim);
 
 				var resumo = dbContext.Database
-									  .SqlQuery<RelatorioResumoDTO>("EXEC dbo.sp_ObterRelatorioResumo @DataInicio, @DataFim", pInicio1, pFim1)
-									  .FirstOrDefault() ?? new RelatorioResumoDTO();
+					.SqlQuery<RelatorioResumoDTO>("EXEC dbo.sp_ObterRelatorioResumo @DataInicio, @DataFim", pInicio1, pFim1)
+					.FirstOrDefault() ?? new RelatorioResumoDTO();
 
 				var pInicio2 = new SqlParameter("@DataInicio", inicio);
 				var pFim2 = new SqlParameter("@DataFim", fim);
 
 				var tarefas = dbContext.Database
-									   .SqlQuery<RelatorioTarefaDTO>("EXEC dbo.sp_ObterRelatorioPorTarefa @DataInicio, @DataFim", pInicio2, pFim2)
-									   .ToList();
+					.SqlQuery<RelatorioTarefaDTO>("EXEC dbo.sp_ObterRelatorioPorTarefa @DataInicio, @DataFim", pInicio2, pFim2)
+					.ToList();
 
 				return Json(new
 				{

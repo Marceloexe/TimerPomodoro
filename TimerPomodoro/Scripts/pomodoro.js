@@ -2,7 +2,6 @@
     'use strict';
     var $ = function (id) { return document.getElementById(id); };
 
-    /* ---------- tema (lembra a escolha) ---------- */
     var root = document.documentElement;
     var themeBtn = $('themeBtn');
     if (themeBtn) {
@@ -13,12 +12,9 @@
         });
     }
 
-    /* ---------- relatório de produtividade (modal) ---------- */
     var g = $;
     var modal = g('reportModal');
     if (modal) {
-        // Busca os dados no servidor: GET Home/Relatorio?inicio=yyyy-MM-dd&fim=yyyy-MM-dd
-        // Resposta esperada: { pomodoros: 0, minutos: 0, tarefas: [ { titulo: "", pomodoros: 0, minutos: 0 } ] }
         var carregar = function () {
             var url = modal.dataset.url + '?dataInicio=' + g('repIni').value + '&dataFim=' + g('repFim').value;
             fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' }, credentials: 'same-origin' })
